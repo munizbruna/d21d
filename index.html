@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detox 30+ & Habit Planner</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-firestore-compat.js"></script>
+</head>
+<body class="bg-slate-50 pb-24">
+
+    <div id="app">
+        </div>
+
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 flex justify-around p-3 z-50">
+        <button onclick="renderWorkoutSection()" class="flex flex-col items-center text-pink-600">
+            <i data-lucide="dumbbell"></i>
+            <span class="text-xs font-bold">Treinos</span>
+        </button>
+        <button onclick="renderHabitSection()" class="flex flex-col items-center text-slate-400">
+            <i data-lucide="check-circle"></i>
+            <span class="text-xs font-bold">Hábitos</span>
+        </button>
+        <button onclick="renderHistorySection()" class="flex flex-col items-center text-slate-400">
+            <i data-lucide="calendar"></i>
+            <span class="text-xs font-bold">Histórico</span>
+        </button>
+    </nav>
+
+    <script>
+        // Configuração do Firebase (Você precisará substituir pelos seus dados)
+        const firebaseConfig = {
+            apiKey: "SUA_API_KEY",
+            authDomain: "SEU_PROJETO.firebaseapp.com",
+            projectId: "SEU_PROJETO_ID",
+            storageBucket: "SEU_PROJETO.appspot.com",
+            messagingSenderId: "SENDER_ID",
+            appId: "APP_ID"
+        };
+        
+        // Inicializar Firebase (Descomente após colocar as credenciais)
+        // firebase.initializeApp(firebaseConfig);
+        // const db = firebase.firestore();
+
+        // Dados de Hábitos Exemplo
+        const DAILY_HABITS = [
+            { id: 'h1', name: 'Beber 3L de Água', icon: 'droplet' },
+            { id: 'h2', name: 'Treino do Dia', icon: 'zap' },
+            { id: 'h3', name: 'Dormir 7h-8h', icon: 'moon' },
+            { id: 'h4', name: 'Sem Açúcar', icon: 'utensils' }
+        ];
+
+        function renderHabitSection() {
+            let html = `
+                <div class="p-5">
+                    <h1 class="text-2xl font-bold text-slate-800 mb-6">Habit Planner</h1>
+                    <div class="grid gap-4">
+            `;
+            
+            DAILY_HABITS.forEach(habit => {
+                html += `
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex justify-between items-center">
+                        <div class="flex items-center gap-3">
+                            <div class="p-2 bg-pink-100 text-pink-600 rounded-lg">
+                                <i data-lucide="${habit.icon}"></i>
+                            </div>
+                            <span class="font-bold text-slate-700">${habit.name}</span>
+                        </div>
+                        <input type="checkbox" onchange="toggleHabit('${habit.id}')" class="w-6 h-6 accent-pink-500">
+                    </div>
+                `;
+            });
+
+            html += `</div></div>`;
+            document.getElementById('app').innerHTML = html;
+            lucide.createIcons();
+        }
+
+        // Função para salvar no Firebase quando um hábito/treino é concluído
+        async function saveToFirebase(collection, data) {
+            console.log(`Salvando em ${collection}:`, data);
+            // Lógica: db.collection(collection).add({...data, timestamp: new Date()});
+        }
+
+        // Inicialização
+        window.onload = () => {
+            renderHabitSection(); // Começa pelos hábitos para teste
+            lucide.createIcons();
+        };
+    </script>
+    <script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
+
+  // Your web app's Firebase configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyChqHvRbf10WYWnKbb7Ud8XSgrv7jeNkzM",
+    authDomain: "d21d-b9e4b.firebaseapp.com",
+    projectId: "d21d-b9e4b",
+    storageBucket: "d21d-b9e4b.firebasestorage.app",
+    messagingSenderId: "154013035782",
+    appId: "1:154013035782:web:66869287b474b2a181c287"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+</script>
+</body>
+</html>
