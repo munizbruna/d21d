@@ -2,112 +2,631 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detox 30+ & Habit Planner</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Desafio Mulheres 30+ Detox</title>
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.x.x/firebase-firestore-compat.js"></script>
+
+    <!-- Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+
+    <style>
+        body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; background-color: #f8fafc; }
+        .fade-in { animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .modal-overlay { background-color: rgba(0, 0, 0, 0.92); backdrop-filter: blur(8px); }
+        
+        .input-compact { 
+            background: #f1f5f9; border: 1px solid #e2e8f0; 
+            border-radius: 8px; padding: 12px; font-size: 1.1rem; font-weight: 700;
+            width: 100%; transition: all 0.2s; color: #334155;
+            text-align: center;
+        }
+        .input-compact:focus { border-color: #be185d; background: #fff; outline: none; box-shadow: 0 0 0 3px rgba(190, 24, 93, 0.1); }
+        .input-compact::placeholder { font-weight: 400; font-size: 0.9rem; color: #94a3b8; }
+        
+        /* Card Styles */
+        .card-base { transition: all 0.3s ease; border: 1px solid #e2e8f0; }
+        .card-done { border-color: #fbcfe8; background-color: #fff1f2; }
+        .card-done .input-compact { background: #fff; border-color: #fbcfe8; color: #9d174d; }
+        
+        /* Buttons */
+        .action-btn {
+            display: flex; align-items: center; justify-content: center;
+            padding: 14px; border-radius: 14px; font-weight: 700; font-size: 0.95rem;
+            transition: transform 0.1s; gap: 8px;
+        }
+        .action-btn:active { transform: scale(0.96); }
+
+        .btn-rest { background: #fff7ed; border: 1px solid #fed7aa; color: #c2410c; }
+        .btn-check { background: #be185d; color: white; border: 1px solid #be185d; box-shadow: 0 4px 15px -3px rgba(190, 24, 93, 0.4); }
+        .btn-check.checked { background: #fff1f2; color: #be185d; border-color: #fbcfe8; box-shadow: none; }
+
+        .badge-bi { background-color: #fdf2f8; color: #be185d; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; }
+        
+        /* Tip Box */
+        .tip-box {
+            background-color: #eff6ff; border-left: 4px solid #3b82f6;
+            padding: 12px; border-radius: 0 8px 8px 0; margin-bottom: 12px;
+        }
+        .tip-text { font-size: 0.85rem; color: #1e40af; line-height: 1.5; }
+
+        /* Video Modal Specifics */
+        .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; background: #000; border-radius: 12px; overflow: hidden; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5); }
+        .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        
+        /* Custom Controls within Modal */
+        .player-controls { display: flex; gap: 8px; margin-top: 12px; overflow-x: auto; padding-bottom: 4px; }
+        .chip-time { 
+            white-space: nowrap; padding: 8px 16px; border-radius: 100px; 
+            background: #1e293b; color: #94a3b8; font-size: 0.75rem; font-weight: 600;
+            border: 1px solid #334155; transition: all 0.2s;
+        }
+        .chip-time.active { background: #be185d; color: white; border-color: #be185d; }
+    </style>
 </head>
-<body class="bg-slate-50 pb-24">
+<body class="text-slate-800 pb-28 select-none bg-slate-50">
 
-    <div id="app">
+    <!-- App Container -->
+    <div id="app" class="max-w-md mx-auto min-h-screen relative overflow-hidden bg-white shadow-2xl"></div>
+
+    <!-- Modal do Vídeo Otimizado -->
+    <div id="video-modal" class="fixed inset-0 modal-overlay z-[60] hidden flex flex-col items-center justify-center p-4 fade-in">
+        <div class="w-full max-w-lg bg-slate-900 rounded-3xl shadow-2xl overflow-hidden flex flex-col">
+            <!-- Header Modal -->
+            <div class="p-4 flex justify-between items-center border-b border-slate-800 bg-slate-900">
+                <div>
+                    <h3 class="text-white font-bold text-base flex items-center gap-2">
+                        <i data-lucide="play-circle" class="text-pink-500" width="18"></i> Player de Aula
+                    </h3>
+                    <p id="video-subtitle" class="text-slate-500 text-xs">Carregando...</p>
+                </div>
+                <button onclick="closeVideoModal()" class="p-2 bg-slate-800 rounded-full text-white hover:bg-slate-700 transition-colors">
+                    <i data-lucide="x" width="22"></i>
+                </button>
+            </div>
+            
+            <!-- Player Area -->
+            <div class="p-0 bg-black relative">
+                <div class="w-full video-wrapper">
+                    <iframe id="video-iframe" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                </div>
+            </div>
+
+            <!-- Controls Area -->
+            <div class="p-5 bg-slate-900">
+                <p class="text-slate-400 text-xs uppercase font-bold tracking-wider mb-3">Segmentos da Aula</p>
+                <div class="flex flex-col gap-2">
+                    <button onclick="seekVideo(30, 'Mobilidade (Até 1:35)')" class="w-full text-left bg-slate-800 hover:bg-slate-700 p-3 rounded-xl flex items-center justify-between group transition-all border border-slate-700 hover:border-pink-500">
+                        <div class="flex items-center gap-3">
+                            <div class="bg-pink-600/20 text-pink-500 p-2 rounded-lg">
+                                <i data-lucide="move" width="16"></i>
+                            </div>
+                            <div>
+                                <span class="text-white font-bold text-sm block">Mobilidade</span>
+                                <span class="text-slate-500 text-xs">00:30 - 01:35</span>
+                            </div>
+                        </div>
+                        <i data-lucide="play" width="14" class="text-slate-500 group-hover:text-pink-500"></i>
+                    </button>
+
+                    <button onclick="seekVideo(95, 'Instruções Gerais')" class="w-full text-left bg-slate-800 hover:bg-slate-700 p-3 rounded-xl flex items-center justify-between group transition-all border border-slate-700 hover:border-blue-500">
+                        <div class="flex items-center gap-3">
+                            <div class="bg-blue-600/20 text-blue-500 p-2 rounded-lg">
+                                <i data-lucide="list-video" width="16"></i>
+                            </div>
+                            <div>
+                                <span class="text-white font-bold text-sm block">Instruções dos Exercícios</span>
+                                <span class="text-slate-500 text-xs">A partir de 01:35</span>
+                            </div>
+                        </div>
+                        <i data-lucide="play" width="14" class="text-slate-500 group-hover:text-blue-500"></i>
+                    </button>
+                </div>
+                
+                <div class="mt-4 pt-4 border-t border-slate-800 text-center">
+                    <a id="video-external-link" href="#" target="_blank" class="text-slate-500 hover:text-white text-xs underline decoration-slate-600">
+                        Problemas com o vídeo? Abrir no navegador
+                    </a>
+                </div>
+            </div>
         </div>
+    </div>
 
-    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 flex justify-around p-3 z-50">
-        <button onclick="renderWorkoutSection()" class="flex flex-col items-center text-pink-600">
-            <i data-lucide="dumbbell"></i>
-            <span class="text-xs font-bold">Treinos</span>
-        </button>
-        <button onclick="renderHabitSection()" class="flex flex-col items-center text-slate-400">
-            <i data-lucide="check-circle"></i>
-            <span class="text-xs font-bold">Hábitos</span>
-        </button>
-        <button onclick="renderHistorySection()" class="flex flex-col items-center text-slate-400">
-            <i data-lucide="calendar"></i>
-            <span class="text-xs font-bold">Histórico</span>
-        </button>
-    </nav>
+    <!-- Modal do Timer -->
+    <div id="timer-modal" class="fixed inset-0 modal-overlay z-50 hidden flex flex-col items-center justify-center p-6 fade-in">
+        <div class="w-full max-w-sm bg-slate-900 border border-slate-700 text-white rounded-3xl shadow-2xl relative overflow-hidden">
+            <div class="absolute top-0 w-full h-1.5 bg-gradient-to-r from-pink-500 to-purple-600"></div>
+            <button onclick="closeTimerModal()" class="absolute top-4 right-4 p-2 text-slate-400 hover:text-white rounded-full bg-slate-800/50">
+                <i data-lucide="x" width="20"></i>
+            </button>
+
+            <div class="p-8 text-center pt-10">
+                <div class="mb-6">
+                    <span id="modal-mode-badge" class="px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest bg-pink-600 text-white shadow-lg shadow-pink-500/30">Execução</span>
+                </div>
+                <h3 id="modal-title" class="text-lg font-medium text-slate-300 mb-2 truncate">Exercício</h3>
+                <div id="timer-display" class="text-8xl font-mono font-bold mb-8 tabular-nums text-white tracking-tighter drop-shadow-2xl">0:00</div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <button id="btn-toggle-timer" class="flex flex-col items-center justify-center gap-1 p-5 rounded-2xl font-bold bg-pink-600 active:bg-pink-700 text-white shadow-lg transition-transform active:scale-95">
+                        <span id="lbl-toggle" class="text-sm uppercase tracking-wide">Iniciar</span>
+                    </button>
+                    <button id="btn-reset-timer" class="flex flex-col items-center justify-center gap-1 p-5 bg-slate-800 active:bg-slate-700 text-slate-300 rounded-2xl font-bold transition-transform active:scale-95">
+                        <span class="text-sm uppercase tracking-wide">Reiniciar</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script>
-        // Configuração do Firebase (Você precisará substituir pelos seus dados)
-        const firebaseConfig = {
-            apiKey: "SUA_API_KEY",
-            authDomain: "SEU_PROJETO.firebaseapp.com",
-            projectId: "SEU_PROJETO_ID",
-            storageBucket: "SEU_PROJETO.appspot.com",
-            messagingSenderId: "SENDER_ID",
-            appId: "APP_ID"
+        // --- CONFIGURAÇÃO E DADOS ---
+        const PLAYLIST_URL = "https://stream.scaleup.com.br/player/v1/playlists/534de5735e8c96e59bb0b321e5e173e86decda91?URLPrefix=1767625456&Expires=1767625456&Signature=c4f1bd100b6b7af4eea65a45252a7cb2545e61c7&accessToken=40db2850-a983-31f0-bca0-73ac7c9efd86";
+
+        // RESUMO INTELIGENTE DOS EXERCÍCIOS (EVITA ASSISTIR AO VÍDEO)
+        const EXERCISE_TIPS = {
+            'Afundo': "Dê um passo largo. Desça o joelho de trás em direção ao chão (sem tocar). Mantenha o tronco reto e abdômen contraído.",
+            'Stiff': "Pés na largura do quadril. Joelhos 'destravados' (semi-flexionados). Desça o tronco empinando o glúteo, mantendo a coluna reta.",
+            'Agachamento': "Pés levemente para fora. Jogue o quadril para trás como se fosse sentar. Joelhos seguem a ponta dos pés. Não tire o calcanhar do chão.",
+            'Cadeira Flexora': "Ajuste o banco. Contraia forte puxando para baixo, segure 1 seg e suba devagar. Não levante o quadril do banco.",
+            'Cadeira Abdutora': "Incline o tronco levemente para frente (desencoste). Empurre os joelhos para fora com força e controle a volta.",
+            'Elevação de Quadril': "Deitada, pés firmes no chão perto do glúteo. Suba o quadril contraindo o bumbum no topo. Segure 2 segundos em cima.",
+            'Flexão de Braço': "Mãos alinhadas com o peito. Corpo reto. Se estiver difícil, apoie os joelhos no chão, mas mantenha o quadril alinhado.",
+            'Remada Curvada': "Tronco inclinado à frente (quase 90 graus). Puxe os pesos em direção à cintura, fechando as costas.",
+            'Supino': "Deitada, pés no chão. Desça a barra na linha do peito. Cotovelos não muito abertos (forma de seta, não de cruz).",
+            'Rosca Alternada': "Cotovelos colados na cintura. Gire o punho ao subir (palma para cima). Não balance as costas.",
+            'Puxada Aberta': "Peito estufado. Puxe a barra em direção à parte alta do peito (clavícula). Cotovelos apontam para o chão.",
+            'Tríceps Francês': "Segure o peso acima da cabeça. Desça o peso atrás da nuca mantendo os cotovelos apontados para o teto.",
+            'Crucifixo': "Braços levemente flexionados (abraço). Abra bem alongando o peito e feche no centro.",
+            'Tríceps Banco': "Mãos no banco, pernas esticadas (ou dobradas para facilitar). Desça o quadril rente ao banco.",
+            'Prancha': "Cotovelos no chão alinhados com ombros. Corpo reto. Contraia glúteo e abdômen. Não prenda a respiração.",
+            'Agachamento Búlgaro': "Pé de trás apoiado no banco. Desça verticalmente. A força está toda na perna da frente.",
+            'Desenvolvimento': "Sentada ou em pé. Empurre os pesos acima da cabeça sem estender totalmente os cotovelos. Cuidado para não arquear as costas.",
+            'Burpee': "Mãos no chão, jogue pés atrás (prancha), volte os pés e salte. Opção leve: Sprawl (sem o salto e sem encostar peito no chão).",
+            'Agachamento Sumô': "Pés bem afastados (mais que o quadril), pontas para fora. Tronco reto. Desça verticalmente.",
+            'Leg Press': "Pés na plataforma. Empurre com o calcanhar. Nunca estique o joelho completamente no final.",
+            'Panturrilha': "Amplitude total: desça o calcanhar até sentir alongar e suba tudo na ponta do pé.",
+            'Mobilidade': "Movimentos dinâmicos para soltar as articulações. Não force alongamento estático, apenas aqueça."
         };
+
+        function getTip(name) {
+            const key = Object.keys(EXERCISE_TIPS).find(k => name.toLowerCase().includes(k.toLowerCase()));
+            return key ? EXERCISE_TIPS[key] : "Mantenha a postura, respire e concentre-se na execução correta.";
+        }
+
+        const WORKOUT_PLAN = {
+            1: {
+                title: "Treino 1: Inferior",
+                description: "Foco: Pernas e Glúteos + Cardio",
+                exercises: [
+                    { 
+                        id: 't1_aq', type: 'single', title: 'Aquecimento', 
+                        items: [{ name: 'Mobilidade Articular', details: 'Vídeo: 0:30 a 1:35' }], restTime: 0, 
+                        specialAction: { label: 'Ver Mobilidade', time: 30 } 
+                    },
+                    { 
+                        id: 't1_b1', type: 'biset', title: 'Bloco 1 - Conjugado', 
+                        items: [
+                            { name: 'Afundo (Peso do corpo)', details: '3x 5 cada perna' },
+                            { name: 'Stiff com Halteres', details: '3x 12 reps' }
+                        ], restTime: 45, note: "Sem descanso entre exercícios" 
+                    },
+                    { 
+                        id: 't1_b2', type: 'biset', title: 'Bloco 2 - Conjugado', 
+                        items: [
+                            { name: 'Cadeira Flexora', details: '3x 12 reps' },
+                            { name: 'Agachamento Halteres', details: '3x 10 reps' }
+                        ], restTime: 60 
+                    },
+                    { 
+                        id: 't1_b3', type: 'biset', title: 'Bloco 3 - Conjugado', 
+                        items: [
+                            { name: 'Cadeira Abdutora', details: '3x 12 reps' },
+                            { name: 'Elevação de Quadril', details: '3x 20 reps' }
+                        ], restTime: 60 
+                    },
+                    { 
+                        id: 't1_fim', type: 'single', title: 'Finalizador', 
+                        items: [{ name: 'Pedalada Forte/Leve', details: '8x (20s Forte + 10s Leve)' }], restTime: 0 
+                    }
+                ]
+            },
+            2: {
+                title: "Treino 2: Superior",
+                description: "Foco: Braços, Costas e Peito",
+                exercises: [
+                    { id: 't2_aq', type: 'single', title: 'Aquecimento', items: [{ name: 'Mobilidade Geral', details: '3x 20s' }], restTime: 0, specialAction: { label: 'Ver Mobilidade', time: 30 } },
+                    { id: 't2_b1', type: 'biset', title: 'Bloco 1', items: [{ name: 'Flexão de Braço', details: '3x 5 reps' }, { name: 'Remada Curvada', details: '3x 10 reps' }], restTime: 60 },
+                    { id: 't2_b2', type: 'biset', title: 'Bloco 2', items: [{ name: 'Supino Barra', details: '3x 10 reps' }, { name: 'Rosca Alternada', details: '3x 12 reps' }], restTime: 60 },
+                    { id: 't2_b3', type: 'biset', title: 'Bloco 3', items: [{ name: 'Puxada Aberta', details: '3x 12 reps' }, { name: 'Tríceps Francês', details: '3x 8 reps' }], restTime: 60 },
+                    { id: 't2_b4', type: 'biset', title: 'Bloco 4', items: [{ name: 'Crucifixo', details: '3x 10 reps' }, { name: 'Tríceps Banco', details: '3x 8 reps' }], restTime: 60 },
+                    { id: 't2_fim', type: 'single', title: 'Core', items: [{ name: 'Prancha Abdominal', details: '4x Falha' }], restTime: 40 }
+                ]
+            },
+            3: {
+                title: "Treino 3: Full Body",
+                description: "Pernas + Ombros e Costas",
+                exercises: [
+                    { id: 't3_aq', type: 'single', title: 'Aquecimento', items: [{ name: 'Desenv + Agach + Chão', details: '3x (5+10+15)' }], restTime: 0, specialAction: { label: 'Ver Aquecimento', time: 30 } },
+                    { id: 't3_b1', type: 'biset', title: 'Bloco 1', items: [{ name: 'Agachamento Búlgaro', details: '3x 8/perna' }, { name: 'Supino Máquina', details: '3x 10 reps' }], restTime: 60 },
+                    { id: 't3_b2', type: 'biset', title: 'Bloco 2', items: [{ name: 'Remada Unilateral', details: '3x 8/braço' }, { name: 'Cadeira Extensora', details: '3x 10' }], restTime: 60 },
+                    { id: 't3_b3', type: 'biset', title: 'Bloco 3', items: [{ name: 'Stiff Barra', details: '3x 12 reps' }, { name: 'Pull Down', details: '3x 10 reps' }], restTime: 60 },
+                    { id: 't3_b4', type: 'biset', title: 'Bloco 4', items: [{ name: 'Agachamento Barra', details: '3x 12 reps' }, { name: 'Desenvolvimento', details: '3x 10 reps' }], restTime: 60 },
+                    { id: 't3_fim', type: 'single', title: 'Final', items: [{ name: 'Burpee + Agach Salto', details: '5 Rounds' }], restTime: 0 }
+                ]
+            },
+            4: {
+                title: "Treino 4: Metabólico",
+                description: "Queima Calórica e Resistência",
+                exercises: [
+                    { id: 't4_main', type: 'single', title: 'Circuito', items: [
+                        { name: 'Cardio Moderado', details: '3 Min' }, { name: 'Agachamentos', details: '20 reps' }, { name: 'Abdominal Remador', details: '10 reps' }
+                    ], restTime: 0, note: "Semana 1: 5 Rounds. Aumentar 1 round/sem." }
+                ]
+            },
+            5: {
+                title: "Treino 5: Pirâmide",
+                description: "Reps 20-16-12-8",
+                exercises: [
+                    { id: 't5_main', type: 'single', title: 'Série Gigante', items: [
+                        { name: 'Agachamento Sumô', details: 'Descrescente' }, { name: 'Leg Press', details: 'Descrescente' }, { name: 'Panturrilha', details: 'Descrescente' }, { name: 'Agachamento Iso', details: '20 seg fim' }
+                    ], restTime: 60 },
+                    { id: 't5_fim', type: 'single', title: 'Cardio', items: [{ name: 'Intervalado 10min', details: '1min Forte/Leve' }], restTime: 0 }
+                ]
+            },
+            6: {
+                title: "Treino 6: Força",
+                description: "Blocos 15-12-9 reps",
+                exercises: [
+                    { id: 't6_b1', type: 'single', title: 'Bloco 1', items: [{ name: 'Supino + Martelo', details: '15-12-9 reps' }], restTime: 0 },
+                    { id: 't6_b2', type: 'single', title: 'Bloco 2', items: [{ name: 'Remada + Testa', details: '15-12-9 reps' }], restTime: 0 },
+                    { id: 't6_b3', type: 'single', title: 'Bloco 3', items: [{ name: 'Thruster + Abd', details: '15-12-9 reps' }], restTime: 0 },
+                    { id: 't6_fim', type: 'single', title: 'Desafio', items: [{ name: 'Snatch + Crunch', details: '10-8-6-4-2' }], restTime: 0 }
+                ]
+            },
+            7: {
+                title: "Treino 7: Full Body",
+                description: "4 Séries de 15 Repetições",
+                exercises: [
+                    { id: 't7_b1', type: 'biset', title: 'Bloco 1', items: [{ name: 'Cadeira Extensora', details: '4x 15' }, { name: 'Puxada Aberta', details: '4x 15' }], restTime: 60 },
+                    { id: 't7_b2', type: 'biset', title: 'Bloco 2', items: [{ name: 'Levantamento Terra', details: '4x 15' }, { name: 'Tríceps Corda', details: '4x 15' }], restTime: 60 },
+                    { id: 't7_b3', type: 'biset', title: 'Bloco 3', items: [{ name: 'Cadeira Flexora', details: '4x 15' }, { name: 'Remada Baixa', details: '4x 15' }], restTime: 60 },
+                    { id: 't7_fim', type: 'single', title: 'Final', items: [{ name: 'Agach Salto + Tap', details: '30-20-10' }], restTime: 0 }
+                ]
+            }
+        };
+
+        // --- SISTEMA DE DADOS ---
+        const DATA_KEY = 'desafio_30_detox_v3';
+        let currentWorkoutKey = null;
+
+        function getTodayKey() { return new Date().toLocaleDateString('pt-BR'); }
+        function getAllData() { return JSON.parse(localStorage.getItem(DATA_KEY) || '{}'); }
+        function getTodayData() {
+            const all = getAllData(); const today = getTodayKey();
+            if (!all[today]) all[today] = {}; return all[today];
+        }
+        function saveExerciseData(exerciseId, data) {
+            const all = getAllData(); const today = getTodayKey();
+            if (!all[today]) all[today] = {};
+            all[today][exerciseId] = { ...all[today][exerciseId], ...data };
+            localStorage.setItem(DATA_KEY, JSON.stringify(all));
+        }
+        function getExerciseData(exerciseId) { return getTodayData()[exerciseId] || {}; }
         
-        // Inicializar Firebase (Descomente após colocar as credenciais)
-        // firebase.initializeApp(firebaseConfig);
-        // const db = firebase.firestore();
+        function resetToday() {
+            if(confirm("Reiniciar o treino de hoje?")) {
+                const all = getAllData();
+                delete all[getTodayKey()];
+                localStorage.setItem(DATA_KEY, JSON.stringify(all));
+                location.reload();
+            }
+        }
 
-        // Dados de Hábitos Exemplo
-        const DAILY_HABITS = [
-            { id: 'h1', name: 'Beber 3L de Água', icon: 'droplet' },
-            { id: 'h2', name: 'Treino do Dia', icon: 'zap' },
-            { id: 'h3', name: 'Dormir 7h-8h', icon: 'moon' },
-            { id: 'h4', name: 'Sem Açúcar', icon: 'utensils' }
-        ];
+        // --- RENDERIZADORES ---
+        const appDiv = document.getElementById('app');
 
-        function renderHabitSection() {
+        function renderHome() {
+            currentWorkoutKey = null;
+            const today = new Date().getDay(); 
+            const schedule = { 1:'1', 2:'2', 3:'3', 4:'4', 5:'5', 6:'6', 0:'7' };
+            const todayKey = schedule[today];
+            
             let html = `
-                <div class="p-5">
-                    <h1 class="text-2xl font-bold text-slate-800 mb-6">Habit Planner</h1>
-                    <div class="grid gap-4">
+                <div class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white p-6 pb-16 rounded-b-[2.5rem] shadow-2xl relative z-10 overflow-hidden">
+                    <!-- Deco Circle -->
+                    <div class="absolute -top-10 -right-10 w-40 h-40 bg-pink-500/20 rounded-full blur-3xl"></div>
+                    
+                    <div class="flex justify-between items-center mb-8 relative z-10">
+                        <div>
+                            <p class="text-[10px] text-pink-400 font-bold uppercase tracking-widest mb-1">Desafio 30+</p>
+                            <h1 class="text-2xl font-bold tracking-tight">Olá, Bruna!</h1>
+                        </div>
+                        <button onclick="resetToday()" class="p-2.5 bg-white/10 rounded-full hover:bg-white/20 transition-all active:scale-95 border border-white/5">
+                            <i data-lucide="refresh-cw" width="18"></i>
+                        </button>
+                    </div>
+
+                    ${todayKey ? `
+                    <div onclick="renderWorkout('${todayKey}')" class="bg-white text-slate-900 p-6 rounded-2xl shadow-xl cursor-pointer active:scale-[0.98] transition-all relative z-10 group">
+                        <div class="flex justify-between items-start mb-3">
+                            <span class="bg-pink-100 text-pink-700 text-[10px] px-2.5 py-1 rounded-full font-extrabold uppercase tracking-wide">Treino de Hoje</span>
+                            <i data-lucide="arrow-right-circle" class="text-slate-300 group-hover:text-pink-500 transition-colors"></i>
+                        </div>
+                        <h2 class="text-2xl font-black mb-1">${WORKOUT_PLAN[todayKey].title}</h2>
+                        <p class="text-sm text-slate-500 font-medium">${WORKOUT_PLAN[todayKey].description}</p>
+                    </div>
+                    ` : ''}
+                </div>
+
+                <div class="px-5 -mt-8 pb-24 relative z-20 space-y-3 fade-in">
+                    <h3 class="font-bold text-slate-400 text-xs uppercase tracking-wider mb-2 pl-2">Biblioteca de Treinos</h3>
             `;
             
-            DAILY_HABITS.forEach(habit => {
+            Object.keys(WORKOUT_PLAN).forEach(key => {
+                if (key === todayKey) return;
+                const plan = WORKOUT_PLAN[key];
                 html += `
-                    <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex justify-between items-center">
-                        <div class="flex items-center gap-3">
-                            <div class="p-2 bg-pink-100 text-pink-600 rounded-lg">
-                                <i data-lucide="${habit.icon}"></i>
-                            </div>
-                            <span class="font-bold text-slate-700">${habit.name}</span>
+                    <button onclick="renderWorkout('${key}')" class="w-full bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4 text-left active:bg-slate-50 hover:border-pink-200 transition-all">
+                        <div class="w-12 h-12 rounded-xl bg-slate-50 text-slate-400 font-bold flex items-center justify-center text-lg border border-slate-100 shadow-inner">${key}</div>
+                        <div>
+                            <h4 class="font-bold text-slate-700 text-sm">${plan.title}</h4>
+                            <p class="text-xs text-slate-400 truncate w-48 font-medium">${plan.description}</p>
                         </div>
-                        <input type="checkbox" onchange="toggleHabit('${habit.id}')" class="w-6 h-6 accent-pink-500">
+                    </button>
+                `;
+            });
+            
+            html += `</div>`;
+            appDiv.innerHTML = html;
+            lucide.createIcons();
+        }
+
+        function renderWorkout(key) {
+            currentWorkoutKey = key;
+            const plan = WORKOUT_PLAN[key];
+            
+            let html = `
+                <div class="bg-white/90 backdrop-blur-md sticky top-0 z-30 px-4 py-4 flex items-center justify-between border-b border-slate-100 shadow-sm">
+                    <button onclick="renderHome()" class="p-2 -ml-2 text-slate-600 hover:bg-slate-100 rounded-full transition-colors">
+                        <i data-lucide="arrow-left" width="22"></i>
+                    </button>
+                    <div class="text-center">
+                        <h1 class="font-bold text-base text-slate-800">${plan.title}</h1>
+                    </div>
+                    <button onclick="openVideoModal(0)" class="p-2 text-pink-600 bg-pink-50 rounded-full hover:bg-pink-100 transition-colors">
+                        <i data-lucide="video" width="20"></i>
+                    </button>
+                </div>
+
+                <div class="p-4 space-y-6 fade-in pb-32 pt-6">
+            `;
+
+            plan.exercises.forEach((ex) => {
+                const stored = getExerciseData(ex.id);
+                const isDone = stored.done;
+
+                let itemsHtml = '';
+                ex.items.forEach((item, idx) => {
+                    const savedW = stored.items?.[idx]?.w || '';
+                    const savedR = stored.items?.[idx]?.r || '';
+                    const tip = getTip(item.name);
+
+                    itemsHtml += `
+                        <div class="mb-6 last:mb-0">
+                            <!-- Header Item -->
+                            <div class="flex flex-col gap-1 mb-3">
+                                <h4 class="font-bold text-slate-800 text-base leading-tight">${item.name}</h4>
+                                <span class="text-xs font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md self-start">${item.details}</span>
+                            </div>
+
+                            <!-- Resumo Expansível (Padrão: Aberto) -->
+                            <div class="tip-box">
+                                <p class="tip-text">${tip}</p>
+                            </div>
+
+                            <!-- Inputs -->
+                            <div class="flex gap-3">
+                                <div class="relative w-1/2">
+                                    <input type="text" value="${savedW}" onchange="saveInput('${ex.id}', ${idx}, 'w', this.value)" class="input-compact pl-8" inputmode="decimal" placeholder="-">
+                                    <span class="absolute left-3 top-3.5 text-[10px] text-slate-400 font-bold">KG</span>
+                                </div>
+                                <div class="relative w-1/2">
+                                    <input type="text" value="${savedR}" onchange="saveInput('${ex.id}', ${idx}, 'r', this.value)" class="input-compact" inputmode="numeric" placeholder="Reps">
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                // Ação Especial (Botão de Vídeo Dedicado)
+                let specialActionHtml = '';
+                if(ex.specialAction) {
+                    specialActionHtml = `
+                        <button onclick="openVideoModal(${ex.specialAction.time})" class="w-full mt-3 py-3 bg-pink-50 text-pink-600 rounded-xl text-xs font-bold uppercase tracking-wide flex items-center justify-center gap-2 hover:bg-pink-100 transition-colors">
+                            <i data-lucide="play-circle" width="16"></i> ${ex.specialAction.label}
+                        </button>
+                    `;
+                }
+
+                html += `
+                    <div id="card-${ex.id}" class="bg-white rounded-3xl p-5 shadow-sm card-base ${isDone ? 'card-done' : ''}">
+                        <div class="flex justify-between items-center mb-5 pb-3 border-b border-slate-50">
+                            <span class="badge-bi">${ex.title}</span>
+                            ${ex.restTime > 0 ? `<span class="text-xs font-bold text-slate-400 flex items-center gap-1 bg-slate-50 px-2 py-1 rounded-lg"><i data-lucide="clock" width="12"></i> ${ex.restTime}s</span>` : ''}
+                        </div>
+                        
+                        ${ex.note ? `<div class="mb-4 bg-amber-50 text-amber-700 text-xs font-medium p-3 rounded-xl border border-amber-100 flex gap-2 items-start"><i data-lucide="alert-triangle" width="14" class="shrink-0 mt-0.5"></i> ${ex.note}</div>` : ''}
+
+                        <div>${itemsHtml}</div>
+                        
+                        ${specialActionHtml}
+
+                        <div class="mt-6 pt-4 border-t border-slate-100 flex gap-3">
+                            ${ex.restTime > 0 ? `
+                                <button onclick="openTimer('rest', 'Descanso', ${ex.restTime})" class="action-btn btn-rest flex-1 shadow-sm">
+                                    <i data-lucide="timer" width="18"></i> ${ex.restTime}s
+                                </button>
+                            ` : ''}
+                            <button onclick="toggleDone('${ex.id}')" id="btn-check-${ex.id}" class="action-btn btn-check flex-1 ${isDone ? 'checked' : ''}">
+                                ${isDone ? `<i data-lucide="check-circle-2" width="18"></i> Feito` : `<i data-lucide="circle" width="18"></i> Concluir`}
+                            </button>
+                        </div>
                     </div>
                 `;
             });
 
-            html += `</div></div>`;
-            document.getElementById('app').innerHTML = html;
+            html += `</div>`;
+            appDiv.innerHTML = html;
             lucide.createIcons();
+            window.scrollTo(0,0);
         }
 
-        // Função para salvar no Firebase quando um hábito/treino é concluído
-        async function saveToFirebase(collection, data) {
-            console.log(`Salvando em ${collection}:`, data);
-            // Lógica: db.collection(collection).add({...data, timestamp: new Date()});
+        // --- VIDEO MODAL LOGIC ---
+        function openVideoModal(startTime = 0) {
+            const modal = document.getElementById('video-modal');
+            const iframe = document.getElementById('video-iframe');
+            const link = document.getElementById('video-external-link');
+            const subtitle = document.getElementById('video-subtitle');
+            
+            // Tratamento de URL para início (t=30)
+            // ScaleUp/Padrão HTML5
+            const timeParam = startTime > 0 ? `&t=${startTime}` : ''; 
+            const finalUrl = PLAYLIST_URL + timeParam;
+            
+            iframe.src = finalUrl;
+            link.href = finalUrl;
+            
+            if (startTime === 30) {
+                subtitle.innerText = "Iniciando em 00:30 (Mobilidade)";
+            } else if (startTime === 95) {
+                subtitle.innerText = "Iniciando em 01:35 (Instruções)";
+            } else {
+                subtitle.innerText = "Aula Completa";
+            }
+
+            modal.classList.remove('hidden');
         }
 
-        // Inicialização
-        window.onload = () => {
-            renderHabitSection(); // Começa pelos hábitos para teste
-            lucide.createIcons();
+        function seekVideo(time, label) {
+            // Recarrega o iframe com o novo tempo
+            openVideoModal(time);
+        }
+
+        function closeVideoModal() {
+            const modal = document.getElementById('video-modal');
+            const iframe = document.getElementById('video-iframe');
+            iframe.src = ""; 
+            modal.classList.add('hidden');
+        }
+
+        // --- TIMER LOGIC (Mantida e Otimizada) ---
+        let timerInt = null;
+        let timerTime = 0;
+        let timerTotal = 0;
+
+        function openTimer(mode, title, seconds) {
+            const modal = document.getElementById('timer-modal');
+            timerTime = seconds;
+            timerTotal = seconds;
+            updateTimerDisplay();
+            
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('btn-toggle-timer').onclick = startTimer;
+            document.getElementById('lbl-toggle').innerText = "INICIAR";
+            
+            modal.classList.remove('hidden');
+        }
+
+        function closeTimerModal() {
+            clearInterval(timerInt);
+            document.getElementById('timer-modal').classList.add('hidden');
+        }
+
+        function updateTimerDisplay() {
+            const m = Math.floor(timerTime / 60);
+            const s = timerTime % 60;
+            document.getElementById('timer-display').innerText = `${m}:${s<10?'0':''}${s}`;
+        }
+
+        function startTimer() {
+            clearInterval(timerInt);
+            document.getElementById('lbl-toggle').innerText = "PAUSAR";
+            document.getElementById('btn-toggle-timer').onclick = pauseTimer;
+            
+            const btn = document.getElementById('btn-toggle-timer');
+            btn.classList.remove('bg-pink-600');
+            btn.classList.add('bg-slate-700');
+            
+            timerInt = setInterval(() => {
+                timerTime--;
+                updateTimerDisplay();
+                if(timerTime <= 0) {
+                    clearInterval(timerInt);
+                    if(navigator.vibrate) navigator.vibrate([200, 100, 200]);
+                    closeTimerModal();
+                }
+            }, 1000);
+        }
+
+        function pauseTimer() {
+            clearInterval(timerInt);
+            document.getElementById('lbl-toggle').innerText = "CONTINUAR";
+            document.getElementById('btn-toggle-timer').onclick = startTimer;
+            const btn = document.getElementById('btn-toggle-timer');
+            btn.classList.add('bg-pink-600');
+            btn.classList.remove('bg-slate-700');
+        }
+
+        document.getElementById('btn-reset-timer').onclick = () => {
+            clearInterval(timerInt);
+            timerTime = timerTotal;
+            updateTimerDisplay();
+            pauseTimer();
+            document.getElementById('lbl-toggle').innerText = "INICIAR";
         };
+
+        // --- DATA PERSISTENCE ---
+        function saveInput(exId, itemIdx, field, val) {
+            const curr = getExerciseData(exId);
+            const items = curr.items || {};
+            if(!items[itemIdx]) items[itemIdx] = {};
+            items[itemIdx][field] = val;
+            saveExerciseData(exId, { items });
+        }
+
+        function toggleDone(exId) {
+            const curr = getExerciseData(exId);
+            const newState = !curr.done;
+            saveExerciseData(exId, { done: newState });
+            
+            const card = document.getElementById(`card-${exId}`);
+            const btn = document.getElementById(`btn-check-${exId}`);
+            
+            if(newState) {
+                card.classList.add('card-done');
+                btn.classList.add('checked');
+                btn.innerHTML = `<i data-lucide="check-circle-2" width="18"></i> Feito`;
+                confetti({ particleCount: 60, spread: 80, origin: { y: 0.7 }, colors: ['#ec4899', '#fbcfe8'] });
+            } else {
+                card.classList.remove('card-done');
+                btn.classList.remove('checked');
+                btn.innerHTML = `<i data-lucide="circle" width="18"></i> Concluir`;
+            }
+            lucide.createIcons();
+        }
+
+        // Init
+        renderHome();
     </script>
-    <script type="module">
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
-
-  // Your web app's Firebase configuration
-  const firebaseConfig = {
-    apiKey: "AIzaSyChqHvRbf10WYWnKbb7Ud8XSgrv7jeNkzM",
-    authDomain: "d21d-b9e4b.firebaseapp.com",
-    projectId: "d21d-b9e4b",
-    storageBucket: "d21d-b9e4b.firebasestorage.app",
-    messagingSenderId: "154013035782",
-    appId: "1:154013035782:web:66869287b474b2a181c287"
-  };
-
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-</script>
 </body>
 </html>
