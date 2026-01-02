@@ -104,32 +104,10 @@
             <!-- Controls Area -->
             <div class="p-5 bg-slate-900">
                 <p class="text-slate-400 text-xs uppercase font-bold tracking-wider mb-3">Segmentos da Aula</p>
-                <div class="flex flex-col gap-2">
-                    <button onclick="seekVideo(30, 'Mobilidade (Até 1:35)')" class="w-full text-left bg-slate-800 hover:bg-slate-700 p-3 rounded-xl flex items-center justify-between group transition-all border border-slate-700 hover:border-pink-500">
-                        <div class="flex items-center gap-3">
-                            <div class="bg-pink-600/20 text-pink-500 p-2 rounded-lg">
-                                <i data-lucide="move" width="16"></i>
-                            </div>
-                            <div>
-                                <span class="text-white font-bold text-sm block">Mobilidade</span>
-                                <span class="text-slate-500 text-xs">00:30 - 01:35</span>
-                            </div>
-                        </div>
-                        <i data-lucide="play" width="14" class="text-slate-500 group-hover:text-pink-500"></i>
-                    </button>
-
-                    <button onclick="seekVideo(95, 'Instruções Gerais')" class="w-full text-left bg-slate-800 hover:bg-slate-700 p-3 rounded-xl flex items-center justify-between group transition-all border border-slate-700 hover:border-blue-500">
-                        <div class="flex items-center gap-3">
-                            <div class="bg-blue-600/20 text-blue-500 p-2 rounded-lg">
-                                <i data-lucide="list-video" width="16"></i>
-                            </div>
-                            <div>
-                                <span class="text-white font-bold text-sm block">Instruções dos Exercícios</span>
-                                <span class="text-slate-500 text-xs">A partir de 01:35</span>
-                            </div>
-                        </div>
-                        <i data-lucide="play" width="14" class="text-slate-500 group-hover:text-blue-500"></i>
-                    </button>
+                
+                <!-- Container Dinâmico dos Segmentos -->
+                <div id="video-segments-container" class="flex flex-col gap-2">
+                    <!-- Os botões serão injetados via JavaScript aqui -->
                 </div>
                 
                 <div class="mt-4 pt-4 border-t border-slate-800 text-center">
@@ -170,43 +148,47 @@
 
     <script>
         // --- CONFIGURAÇÃO E DADOS ---
-        const PLAYLIST_URL = "https://stream.scaleup.com.br/player/v1/playlists/534de5735e8c96e59bb0b321e5e173e86decda91?URLPrefix=1767625456&Expires=1767625456&Signature=c4f1bd100b6b7af4eea65a45252a7cb2545e61c7&accessToken=40db2850-a983-31f0-bca0-73ac7c9efd86";
-
-        // RESUMO INTELIGENTE DOS EXERCÍCIOS (EVITA ASSISTIR AO VÍDEO)
+        const DEFAULT_VIDEO = "https://stream.scaleup.com.br/player/v1/playlists/534de5735e8c96e59bb0b321e5e173e86decda91?URLPrefix=1767625456&Expires=1767625456&Signature=c4f1bd100b6b7af4eea65a45252a7cb2545e61c7&accessToken=40db2850-a983-31f0-bca0-73ac7c9efd86";
+        
+        // RESUMO INTELIGENTE DOS EXERCÍCIOS
         const EXERCISE_TIPS = {
-            'Afundo': "Dê um passo largo. Desça o joelho de trás em direção ao chão (sem tocar). Mantenha o tronco reto e abdômen contraído.",
-            'Stiff': "Pés na largura do quadril. Joelhos 'destravados' (semi-flexionados). Desça o tronco empinando o glúteo, mantendo a coluna reta.",
-            'Agachamento': "Pés levemente para fora. Jogue o quadril para trás como se fosse sentar. Joelhos seguem a ponta dos pés. Não tire o calcanhar do chão.",
-            'Cadeira Flexora': "Ajuste o banco. Contraia forte puxando para baixo, segure 1 seg e suba devagar. Não levante o quadril do banco.",
-            'Cadeira Abdutora': "Incline o tronco levemente para frente (desencoste). Empurre os joelhos para fora com força e controle a volta.",
-            'Elevação de Quadril': "Deitada, pés firmes no chão perto do glúteo. Suba o quadril contraindo o bumbum no topo. Segure 2 segundos em cima.",
-            'Flexão de Braço': "Mãos alinhadas com o peito. Corpo reto. Se estiver difícil, apoie os joelhos no chão, mas mantenha o quadril alinhado.",
-            'Remada Curvada': "Tronco inclinado à frente (quase 90 graus). Puxe os pesos em direção à cintura, fechando as costas.",
-            'Supino': "Deitada, pés no chão. Desça a barra na linha do peito. Cotovelos não muito abertos (forma de seta, não de cruz).",
-            'Rosca Alternada': "Cotovelos colados na cintura. Gire o punho ao subir (palma para cima). Não balance as costas.",
-            'Puxada Aberta': "Peito estufado. Puxe a barra em direção à parte alta do peito (clavícula). Cotovelos apontam para o chão.",
-            'Tríceps Francês': "Segure o peso acima da cabeça. Desça o peso atrás da nuca mantendo os cotovelos apontados para o teto.",
-            'Crucifixo': "Braços levemente flexionados (abraço). Abra bem alongando o peito e feche no centro.",
-            'Tríceps Banco': "Mãos no banco, pernas esticadas (ou dobradas para facilitar). Desça o quadril rente ao banco.",
-            'Prancha': "Cotovelos no chão alinhados com ombros. Corpo reto. Contraia glúteo e abdômen. Não prenda a respiração.",
-            'Agachamento Búlgaro': "Pé de trás apoiado no banco. Desça verticalmente. A força está toda na perna da frente.",
-            'Desenvolvimento': "Sentada ou em pé. Empurre os pesos acima da cabeça sem estender totalmente os cotovelos. Cuidado para não arquear as costas.",
-            'Burpee': "Mãos no chão, jogue pés atrás (prancha), volte os pés e salte. Opção leve: Sprawl (sem o salto e sem encostar peito no chão).",
-            'Agachamento Sumô': "Pés bem afastados (mais que o quadril), pontas para fora. Tronco reto. Desça verticalmente.",
-            'Leg Press': "Pés na plataforma. Empurre com o calcanhar. Nunca estique o joelho completamente no final.",
-            'Panturrilha': "Amplitude total: desça o calcanhar até sentir alongar e suba tudo na ponta do pé.",
-            'Mobilidade': "Movimentos dinâmicos para soltar as articulações. Não force alongamento estático, apenas aqueça."
+            'Afundo': "Dê um passo largo. Desça o joelho de trás em direção ao chão. Tronco reto.",
+            'Stiff': "Pés na largura do quadril. Joelhos semi-flexionados. Empine o glúteo.",
+            'Agachamento': "Jogue o quadril para trás. Joelhos seguem a ponta dos pés.",
+            'Cadeira Flexora': "Contraia forte puxando para baixo, segure 1 seg e suba devagar.",
+            'Cadeira Abdutora': "Incline o tronco levemente à frente. Empurre os joelhos para fora.",
+            'Elevação de Quadril': "Suba o quadril contraindo o bumbum no topo. Segure 2 seg.",
+            'Flexão de Braço': "Corpo reto. Apoie joelhos se precisar. Cotovelos a 45 graus.",
+            'Remada Curvada': "Tronco inclinado. Puxe os pesos na direção da cintura.",
+            'Supino': "Desça a barra na linha do peito. Cotovelos não muito abertos.",
+            'Rosca Alternada': "Cotovelos colados na cintura. Gire o punho ao subir.",
+            'Puxada Aberta': "Puxe a barra em direção à clavícula. Peito estufado.",
+            'Tríceps Francês': "Cotovelos apontados para o teto. Desça o peso atrás da nuca.",
+            'Crucifixo': "Braços levemente flexionados. Abra bem o peito.",
+            'Tríceps Banco': "Desça o quadril rente ao banco. Cotovelos fechados.",
+            'Prancha': "Cotovelos alinhados com ombros. Contraia glúteo e abdômen.",
+            'Agachamento Búlgaro': "Força na perna da frente. Tronco levemente inclinado.",
+            'Desenvolvimento': "Empurre acima da cabeça. Não arqueie as costas.",
+            'Burpee': "Mãos no chão, prancha, volta e salto.",
+            'Agachamento Sumô': "Pés afastados, pontas para fora. Desça verticalmente.",
+            'Leg Press': "Empurre com o calcanhar. Não estique o joelho todo.",
+            'Panturrilha': "Amplitude total: desça bem e suba tudo."
         };
 
         function getTip(name) {
             const key = Object.keys(EXERCISE_TIPS).find(k => name.toLowerCase().includes(k.toLowerCase()));
-            return key ? EXERCISE_TIPS[key] : "Mantenha a postura, respire e concentre-se na execução correta.";
+            return key ? EXERCISE_TIPS[key] : "Mantenha a postura e concentre-se na execução.";
         }
 
         const WORKOUT_PLAN = {
             1: {
                 title: "Treino 1: Inferior",
                 description: "Foco: Pernas e Glúteos + Cardio",
+                videoUrl: DEFAULT_VIDEO,
+                segments: [
+                    { time: 30, label: "Mobilidade", sub: "00:30 - 01:35", icon: "move", color: "pink" },
+                    { time: 95, label: "Instruções", sub: "A partir de 01:35", icon: "list-video", color: "blue" }
+                ],
                 exercises: [
                     { 
                         id: 't1_aq', type: 'single', title: 'Aquecimento', 
@@ -215,24 +197,15 @@
                     },
                     { 
                         id: 't1_b1', type: 'biset', title: 'Bloco 1 - Conjugado', 
-                        items: [
-                            { name: 'Afundo (Peso do corpo)', details: '3x 5 cada perna' },
-                            { name: 'Stiff com Halteres', details: '3x 12 reps' }
-                        ], restTime: 45, note: "Sem descanso entre exercícios" 
+                        items: [{ name: 'Afundo (Peso do corpo)', details: '3x 5 cada perna' }, { name: 'Stiff com Halteres', details: '3x 12 reps' }], restTime: 45 
                     },
                     { 
                         id: 't1_b2', type: 'biset', title: 'Bloco 2 - Conjugado', 
-                        items: [
-                            { name: 'Cadeira Flexora', details: '3x 12 reps' },
-                            { name: 'Agachamento Halteres', details: '3x 10 reps' }
-                        ], restTime: 60 
+                        items: [{ name: 'Cadeira Flexora', details: '3x 12 reps' }, { name: 'Agachamento Halteres', details: '3x 10 reps' }], restTime: 60 
                     },
                     { 
                         id: 't1_b3', type: 'biset', title: 'Bloco 3 - Conjugado', 
-                        items: [
-                            { name: 'Cadeira Abdutora', details: '3x 12 reps' },
-                            { name: 'Elevação de Quadril', details: '3x 20 reps' }
-                        ], restTime: 60 
+                        items: [{ name: 'Cadeira Abdutora', details: '3x 12 reps' }, { name: 'Elevação de Quadril', details: '3x 20 reps' }], restTime: 60 
                     },
                     { 
                         id: 't1_fim', type: 'single', title: 'Finalizador', 
@@ -243,8 +216,12 @@
             2: {
                 title: "Treino 2: Superior",
                 description: "Foco: Braços, Costas e Peito",
+                videoUrl: "https://stream.scaleup.com.br/player/v1/playlists/193c055d25c928c4b69844ace46f1a771d1bbe77?URLPrefix=1767927789&Expires=1767927789&Signature=7d4e0686c7d560f562ad5a786e4833050677c1df&accessToken=f5583bac-0f69-34b1-8814-0ab76c495af6&authorization=eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ7XCJhY2Nlc3NUb2tlblwiOlwiZGZlZGE1M2YtMjI5Zi0zN2YwLWEwZWItOWM1NmYyOTZlMjgyXCIsXCJ1c2VyQWdlbnRcIjpcImF4aW9zLzEuNC4wXCIsXCJjdXN0b21lckNvZGVcIjpcIjk1MmMzMmYwLTUxM2EtMzc2Yy1iMTRiLWEyN2EwZjVkNjhhN1wiLFwiaXBcIjpcIjMuOTQuMTM4LjE3XCIsXCJ1c2VyXCI6e1wiaWRcIjoxMjUxOCxcImNvZGVcIjpcIjM4YmEzNDQyMDI1ZjRlYjZkNTNmODY0NDViNjQ4OTU2ZmQ2YzI4YmVcIixcIm9wZXJhdG9yXCI6ZmFsc2UsXCJvcGVyYXRvclVzZXJKdXN0Q3JlYXRlZFwiOmZhbHNlfSxcImNyZWF0ZWRBdFwiOlwiMjAyNi0wMS0wMlQwMDowMzowOS40NzZcIixcImV4cGlyZWRBdFwiOlwiMjAyNi0wMS0wNVQwMDowMzowOS40NzZcIn0iLCJleHAiOjE3Njc5Mjc3ODksImlhdCI6MTc2NzMyMjk4OX0.xngdCi2gyyjPP2i22aL5SgXmevm5ap3DFXaCQ5j_uFqs0fkYcOWU9wqYpwPcWzLmfiLURYcqbWOdAHItWKuVMw",
+                segments: [
+                     { time: 0, label: "Aula Completa", sub: "Reproduzir do início", icon: "play", color: "pink" }
+                ],
                 exercises: [
-                    { id: 't2_aq', type: 'single', title: 'Aquecimento', items: [{ name: 'Mobilidade Geral', details: '3x 20s' }], restTime: 0, specialAction: { label: 'Ver Mobilidade', time: 30 } },
+                    { id: 't2_aq', type: 'single', title: 'Aquecimento', items: [{ name: 'Mobilidade Geral', details: '3x 20s' }], restTime: 0, specialAction: { label: 'Ver Aquecimento', time: 0 } },
                     { id: 't2_b1', type: 'biset', title: 'Bloco 1', items: [{ name: 'Flexão de Braço', details: '3x 5 reps' }, { name: 'Remada Curvada', details: '3x 10 reps' }], restTime: 60 },
                     { id: 't2_b2', type: 'biset', title: 'Bloco 2', items: [{ name: 'Supino Barra', details: '3x 10 reps' }, { name: 'Rosca Alternada', details: '3x 12 reps' }], restTime: 60 },
                     { id: 't2_b3', type: 'biset', title: 'Bloco 3', items: [{ name: 'Puxada Aberta', details: '3x 12 reps' }, { name: 'Tríceps Francês', details: '3x 8 reps' }], restTime: 60 },
@@ -255,6 +232,7 @@
             3: {
                 title: "Treino 3: Full Body",
                 description: "Pernas + Ombros e Costas",
+                videoUrl: DEFAULT_VIDEO,
                 exercises: [
                     { id: 't3_aq', type: 'single', title: 'Aquecimento', items: [{ name: 'Desenv + Agach + Chão', details: '3x (5+10+15)' }], restTime: 0, specialAction: { label: 'Ver Aquecimento', time: 30 } },
                     { id: 't3_b1', type: 'biset', title: 'Bloco 1', items: [{ name: 'Agachamento Búlgaro', details: '3x 8/perna' }, { name: 'Supino Máquina', details: '3x 10 reps' }], restTime: 60 },
@@ -267,6 +245,7 @@
             4: {
                 title: "Treino 4: Metabólico",
                 description: "Queima Calórica e Resistência",
+                videoUrl: DEFAULT_VIDEO,
                 exercises: [
                     { id: 't4_main', type: 'single', title: 'Circuito', items: [
                         { name: 'Cardio Moderado', details: '3 Min' }, { name: 'Agachamentos', details: '20 reps' }, { name: 'Abdominal Remador', details: '10 reps' }
@@ -276,6 +255,7 @@
             5: {
                 title: "Treino 5: Pirâmide",
                 description: "Reps 20-16-12-8",
+                videoUrl: DEFAULT_VIDEO,
                 exercises: [
                     { id: 't5_main', type: 'single', title: 'Série Gigante', items: [
                         { name: 'Agachamento Sumô', details: 'Descrescente' }, { name: 'Leg Press', details: 'Descrescente' }, { name: 'Panturrilha', details: 'Descrescente' }, { name: 'Agachamento Iso', details: '20 seg fim' }
@@ -286,6 +266,7 @@
             6: {
                 title: "Treino 6: Força",
                 description: "Blocos 15-12-9 reps",
+                videoUrl: DEFAULT_VIDEO,
                 exercises: [
                     { id: 't6_b1', type: 'single', title: 'Bloco 1', items: [{ name: 'Supino + Martelo', details: '15-12-9 reps' }], restTime: 0 },
                     { id: 't6_b2', type: 'single', title: 'Bloco 2', items: [{ name: 'Remada + Testa', details: '15-12-9 reps' }], restTime: 0 },
@@ -296,6 +277,7 @@
             7: {
                 title: "Treino 7: Full Body",
                 description: "4 Séries de 15 Repetições",
+                videoUrl: DEFAULT_VIDEO,
                 exercises: [
                     { id: 't7_b1', type: 'biset', title: 'Bloco 1', items: [{ name: 'Cadeira Extensora', details: '4x 15' }, { name: 'Puxada Aberta', details: '4x 15' }], restTime: 60 },
                     { id: 't7_b2', type: 'biset', title: 'Bloco 2', items: [{ name: 'Levantamento Terra', details: '4x 15' }, { name: 'Tríceps Corda', details: '4x 15' }], restTime: 60 },
@@ -343,7 +325,6 @@
             
             let html = `
                 <div class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white p-6 pb-16 rounded-b-[2.5rem] shadow-2xl relative z-10 overflow-hidden">
-                    <!-- Deco Circle -->
                     <div class="absolute -top-10 -right-10 w-40 h-40 bg-pink-500/20 rounded-full blur-3xl"></div>
                     
                     <div class="flex justify-between items-center mb-8 relative z-10">
@@ -423,18 +404,11 @@
 
                     itemsHtml += `
                         <div class="mb-6 last:mb-0">
-                            <!-- Header Item -->
                             <div class="flex flex-col gap-1 mb-3">
                                 <h4 class="font-bold text-slate-800 text-base leading-tight">${item.name}</h4>
                                 <span class="text-xs font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md self-start">${item.details}</span>
                             </div>
-
-                            <!-- Resumo Expansível (Padrão: Aberto) -->
-                            <div class="tip-box">
-                                <p class="tip-text">${tip}</p>
-                            </div>
-
-                            <!-- Inputs -->
+                            <div class="tip-box"><p class="tip-text">${tip}</p></div>
                             <div class="flex gap-3">
                                 <div class="relative w-1/2">
                                     <input type="text" value="${savedW}" onchange="saveInput('${ex.id}', ${idx}, 'w', this.value)" class="input-compact pl-8" inputmode="decimal" placeholder="-">
@@ -448,7 +422,6 @@
                     `;
                 });
 
-                // Ação Especial (Botão de Vídeo Dedicado)
                 let specialActionHtml = '';
                 if(ex.specialAction) {
                     specialActionHtml = `
@@ -464,19 +437,11 @@
                             <span class="badge-bi">${ex.title}</span>
                             ${ex.restTime > 0 ? `<span class="text-xs font-bold text-slate-400 flex items-center gap-1 bg-slate-50 px-2 py-1 rounded-lg"><i data-lucide="clock" width="12"></i> ${ex.restTime}s</span>` : ''}
                         </div>
-                        
                         ${ex.note ? `<div class="mb-4 bg-amber-50 text-amber-700 text-xs font-medium p-3 rounded-xl border border-amber-100 flex gap-2 items-start"><i data-lucide="alert-triangle" width="14" class="shrink-0 mt-0.5"></i> ${ex.note}</div>` : ''}
-
                         <div>${itemsHtml}</div>
-                        
                         ${specialActionHtml}
-
                         <div class="mt-6 pt-4 border-t border-slate-100 flex gap-3">
-                            ${ex.restTime > 0 ? `
-                                <button onclick="openTimer('rest', 'Descanso', ${ex.restTime})" class="action-btn btn-rest flex-1 shadow-sm">
-                                    <i data-lucide="timer" width="18"></i> ${ex.restTime}s
-                                </button>
-                            ` : ''}
+                            ${ex.restTime > 0 ? `<button onclick="openTimer('rest', 'Descanso', ${ex.restTime})" class="action-btn btn-rest flex-1 shadow-sm"><i data-lucide="timer" width="18"></i> ${ex.restTime}s</button>` : ''}
                             <button onclick="toggleDone('${ex.id}')" id="btn-check-${ex.id}" class="action-btn btn-check flex-1 ${isDone ? 'checked' : ''}">
                                 ${isDone ? `<i data-lucide="check-circle-2" width="18"></i> Feito` : `<i data-lucide="circle" width="18"></i> Concluir`}
                             </button>
@@ -491,34 +456,69 @@
             window.scrollTo(0,0);
         }
 
-        // --- VIDEO MODAL LOGIC ---
+        // --- VIDEO MODAL LOGIC (ATUALIZADA) ---
         function openVideoModal(startTime = 0) {
             const modal = document.getElementById('video-modal');
             const iframe = document.getElementById('video-iframe');
             const link = document.getElementById('video-external-link');
             const subtitle = document.getElementById('video-subtitle');
+            const segmentsContainer = document.getElementById('video-segments-container');
+            
+            const currentPlan = WORKOUT_PLAN[currentWorkoutKey];
+            const videoUrl = currentPlan?.videoUrl || DEFAULT_VIDEO;
             
             // Tratamento de URL para início (t=30)
-            // ScaleUp/Padrão HTML5
             const timeParam = startTime > 0 ? `&t=${startTime}` : ''; 
-            const finalUrl = PLAYLIST_URL + timeParam;
+            const finalUrl = videoUrl + timeParam;
             
             iframe.src = finalUrl;
             link.href = finalUrl;
             
-            if (startTime === 30) {
-                subtitle.innerText = "Iniciando em 00:30 (Mobilidade)";
-            } else if (startTime === 95) {
-                subtitle.innerText = "Iniciando em 01:35 (Instruções)";
+            // Texto do Subtítulo
+            if (startTime > 0) {
+                subtitle.innerText = `Iniciando em ${formatTime(startTime)}`;
             } else {
                 subtitle.innerText = "Aula Completa";
             }
 
+            // Geração Dinâmica dos Botões de Segmentos
+            let segmentsHtml = '';
+            const segments = currentPlan?.segments || [];
+            
+            if(segments.length > 0) {
+                segments.forEach(seg => {
+                    segmentsHtml += `
+                        <button onclick="seekVideo(${seg.time}, '${seg.label}')" class="w-full text-left bg-slate-800 hover:bg-slate-700 p-3 rounded-xl flex items-center justify-between group transition-all border border-slate-700 hover:border-${seg.color || 'pink'}-500">
+                            <div class="flex items-center gap-3">
+                                <div class="bg-${seg.color || 'pink'}-600/20 text-${seg.color || 'pink'}-500 p-2 rounded-lg">
+                                    <i data-lucide="${seg.icon || 'play'}" width="16"></i>
+                                </div>
+                                <div>
+                                    <span class="text-white font-bold text-sm block">${seg.label}</span>
+                                    <span class="text-slate-500 text-xs">${seg.sub || ''}</span>
+                                </div>
+                            </div>
+                            <i data-lucide="play" width="14" class="text-slate-500 group-hover:text-${seg.color || 'pink'}-500"></i>
+                        </button>
+                    `;
+                });
+            } else {
+                segmentsHtml = `<p class="text-slate-600 text-xs italic text-center py-2">Nenhum capítulo disponível para este vídeo.</p>`;
+            }
+            
+            segmentsContainer.innerHTML = segmentsHtml;
+            lucide.createIcons(); // Recriar ícones para os novos botões
+
             modal.classList.remove('hidden');
         }
 
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${mins < 10 ? '0'+mins : mins}:${secs < 10 ? '0'+secs : secs}`;
+        }
+
         function seekVideo(time, label) {
-            // Recarrega o iframe com o novo tempo
             openVideoModal(time);
         }
 
@@ -529,7 +529,7 @@
             modal.classList.add('hidden');
         }
 
-        // --- TIMER LOGIC (Mantida e Otimizada) ---
+        // --- TIMER LOGIC ---
         let timerInt = null;
         let timerTime = 0;
         let timerTotal = 0;
@@ -562,7 +562,6 @@
             clearInterval(timerInt);
             document.getElementById('lbl-toggle').innerText = "PAUSAR";
             document.getElementById('btn-toggle-timer').onclick = pauseTimer;
-            
             const btn = document.getElementById('btn-toggle-timer');
             btn.classList.remove('bg-pink-600');
             btn.classList.add('bg-slate-700');
@@ -608,7 +607,6 @@
             const curr = getExerciseData(exId);
             const newState = !curr.done;
             saveExerciseData(exId, { done: newState });
-            
             const card = document.getElementById(`card-${exId}`);
             const btn = document.getElementById(`btn-check-${exId}`);
             
