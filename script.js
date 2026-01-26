@@ -26,7 +26,7 @@ const auth = getAuth(app);
 const db = getDatabase(app);
 const provider = new GoogleAuthProvider();
 
-const EMAIL_AUTORIZADO = "seu-email@gmail.com"; 
+const EMAIL_AUTORIZADO = "bompatricio@gmail.com"; 
 
 // --- GESTÃO DE INTERFACE E LOGIN ---
 
