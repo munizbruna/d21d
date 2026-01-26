@@ -1,0 +1,199 @@
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            background-color: #f8fafc;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-overlay {
+            background-color: rgba(0, 0, 0, 0.92);
+            backdrop-filter: blur(8px);
+        }
+
+        .input-compact {
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            width: 100%;
+            transition: all 0.2s;
+            color: #334155;
+            text-align: center;
+        }
+
+        .input-compact:focus {
+            border-color: #be185d;
+            background: #fff;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(190, 24, 93, 0.1);
+        }
+
+        .input-compact::placeholder {
+            font-weight: 400;
+            font-size: 0.9rem;
+            color: #94a3b8;
+        }
+
+        /* Card Styles */
+        .card-base {
+            transition: all 0.3s ease;
+            border: 1px solid #e2e8f0;
+        }
+
+        .card-done {
+            border-color: #fbcfe8;
+            background-color: #fff1f2;
+        }
+
+        .card-done .input-compact {
+            background: #fff;
+            border-color: #fbcfe8;
+            color: #9d174d;
+        }
+
+        /* Buttons */
+        .action-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 14px;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            transition: transform 0.1s;
+            gap: 8px;
+        }
+
+        .action-btn:active {
+            transform: scale(0.96);
+        }
+
+        .btn-rest {
+            background: #fff7ed;
+            border: 1px solid #fed7aa;
+            color: #c2410c;
+        }
+
+        .btn-check {
+            background: #be185d;
+            color: white;
+            border: 1px solid #be185d;
+            box-shadow: 0 4px 15px -3px rgba(190, 24, 93, 0.4);
+        }
+
+        .btn-check.checked {
+            background: #fff1f2;
+            color: #be185d;
+            border-color: #fbcfe8;
+            box-shadow: none;
+        }
+
+        .badge-bi {
+            background-color: #fdf2f8;
+            color: #be185d;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Tip Box */
+        .tip-box {
+            background-color: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            padding: 12px;
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 12px;
+        }
+
+        .tip-text {
+            font-size: 0.85rem;
+            color: #1e40af;
+            line-height: 1.5;
+        }
+
+        /* Video Modal Specifics */
+        .video-wrapper {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            background: #000;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+        }
+
+        .video-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Custom Controls within Modal */
+        .player-controls {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+        }
+
+        .chip-time {
+            white-space: nowrap;
+            padding: 8px 16px;
+            border-radius: 100px;
+            background: #1e293b;
+            color: #94a3b8;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border: 1px solid #334155;
+            transition: all 0.2s;
+        }
+
+        .chip-time.active {
+            background: #be185d;
+            color: white;
+            border-color: #be185d;
+        }
+
+        /* Status Bar */
+        #connection-status {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #0f172a;
+            color: white;
+            padding: 8px;
+            font-size: 0.75rem;
+            text-align: center;
+            font-weight: bold;
+            transform: translateY(100%);
+            transition: transform 0.3s;
+            z-index: 100;
+        }
+
+        #connection-status.show {
+            transform: translateY(0);
+        }
