@@ -1,4 +1,4 @@
-
+//teste
         // --- FIREBASE CONFIGURATION (Inserida) ---
         const firebaseConfig = {
             apiKey: "AIzaSyChqHvRbf10WYWnKbb7Ud8XSgrv7jeNkzM",
