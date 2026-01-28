@@ -78,7 +78,7 @@ const WORKOUT_PLAN = {
     2: {
         title: "Treino 2: Superior",
         description: "Foco: Braços, Costas e Peito",
-        videoUrl: "https://stream.scaleup.com.br/player/v1/playlists/193c055d25c928c4b69844ace46f1a771d1bbe77?URLPrefix=1767927789&Expires=1767927789&Signature=7d4e0686c7d560f562ad5a786e4833050677c1df&accessToken=f5583bac-0f69-34b1-8814-0ab76c495af6&authorization=eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ7XCJhY2Nlc3NUb2tlblwiOlwiZGZlZGE1M2YtMjI5Zi0zN2YwLWEwZWItOWM1NmYyOTZlMjgyXCIsXCJ1c2VyQWdlbnRcIjpcImF4aW9zLzEuNC4wXCIsXCJjdXN0b21lckNvZGVcIjpcIjk1MmMzMmYwLTUxM2EtMzc2Yy1iMTRiLWEyN2EwZjVkNjhhN1wiLFwiaXBcIjpcIjMuOTQuMTM4LjE3XCIsXCJ1c2VyXCI6e1wiaWRcIjoxMjUxOCxcImNvZGVcIjpcIjM4YmEzNDQyMDI1ZjRlYjZkNTNmODY0NDViNjQ4OTU2ZmQ2YzI4YmVcIixcIm9wZXJhdG9yXCI6ZmFsc2UsXCJvcGVyYXRvclVzZXJKdXN0Q3JlYXRlZFwiOmZhbHNlfSxcImNyZWF0ZWRBdFwiOlwiMjAyNi0wMS0wMlQwMDowMzowOS40NzZcIixcImV4cGlyZWRBdFwiOlwiMjAyNi0wMS0wNVQwMDowMzowOS40NzZcIn0iLCJleHAiOjE3Njc5Mjc3ODksImlhdCI6MTc2NzMyMjk4OX0.xngdCi2gyyjPP2i22aL5SgXmevm5ap3DFXaCQ5j_uFqs0fkYcOWU9wqYpwPcWzLmfiLURYcqbWOdAHItWKuVMw",
+        videoUrl: "./videos/534de5735e8c96e59bb0b321e5e173e86decda91",
         segments: [{ time: 0, label: "Aula Completa", sub: "Reproduzir do início", icon: "play", color: "pink" }],
         exercises: [
             { id: 't2_aq', type: 'single', title: 'Aquecimento', items: [{ name: 'Mobilidade Geral', details: '3x 20s' }], restTime: 0, specialAction: { label: 'Ver Aquecimento', time: 0 } },
@@ -92,7 +92,7 @@ const WORKOUT_PLAN = {
     3: {
         title: "Treino 3: Full Body",
         description: "Pernas + Ombros e Costas",
-        videoUrl: DEFAULT_VIDEO,
+        videoUrl: "./videos/c225a2e2c990a187487b8cff1196bdb8c5cd8fc6",
         exercises: [
             { id: 't3_aq', type: 'single', title: 'Aquecimento', items: [{ name: 'Desenv + Agach + Chão', details: '3x (5+10+15)' }], restTime: 0, specialAction: { label: 'Ver Aquecimento', time: 30 } },
             { id: 't3_b1', type: 'biset', title: 'Bloco 1', items: [{ name: 'Agachamento Búlgaro', details: '3x 8/perna' }, { name: 'Supino Máquina', details: '3x 10 reps' }], restTime: 60 },
