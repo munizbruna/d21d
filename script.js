@@ -92,7 +92,7 @@ const WORKOUT_PLAN = {
     3: {
         title: "Treino 3: Full Body",
         description: "Pernas + Ombros e Costas",
-        videoUrl: "./videos/c225a2e2c990a187487b8cff1196bdb8c5cd8fc6.mp4",
+        videoUrl: "https://stream.scaleup.com.br/player/v1/playlists/c225a2e2c990a187487b8cff1196bdb8c5cd8fc6?URLPrefix=1770215407&Expires=1770215407&Signature=0fcc3dc399d49e88c0f7e98b5a36e8b591a569f3&accessToken=2d33923c-a6b0-36d1-ae3f-2fe71d2f15b6&authorization=eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ7XCJhY2Nlc3NUb2tlblwiOlwiN2YxMWYzNDItMjRjNy0zZWU3LThiNjQtNzc5ZGJmOTU2NTBhXCIsXCJ1c2VyQWdlbnRcIjpcImF4aW9zLzEuNC4wXCIsXCJjdXN0b21lckNvZGVcIjpcImZjNmIxMmU5LWNmZGMtMzYxYS1iZWUwLTY1MjI0YzJjZjFjY1wiLFwiaXBcIjpcIjMuOTQuMTM4LjE3XCIsXCJ1c2VyXCI6e1wiaWRcIjoxMjUxOCxcImNvZGVcIjpcIjM4YmEzNDQyMDI1ZjRlYjZkNTNmODY0NDViNjQ4OTU2ZmQ2YzI4YmVcIixcIm9wZXJhdG9yXCI6ZmFsc2UsXCJvcGVyYXRvclVzZXJKdXN0Q3JlYXRlZFwiOmZhbHNlfSxcImNyZWF0ZWRBdFwiOlwiMjAyNi0wMS0yOFQxMTozMDowNy4yODJcIixcImV4cGlyZWRBdFwiOlwiMjAyNi0wMS0zMVQxMTozMDowNy4yODJcIn0iLCJleHAiOjE3NzAyMTU0MDcsImlhdCI6MTc2OTYxMDYwN30.yiCrpdJZNLJPzCTpvM40r-rOWU0gwQzFx0YvQMIQtgyCnbNKkcgtoTjpRCfynX7zoqhbV_BMUziLE68ar8bU8g",
         exercises: [
             { id: 't3_aq', type: 'single', title: 'Aquecimento', items: [{ name: 'Desenv + Agach + Chão', details: '3x (5+10+15)' }], restTime: 0, specialAction: { label: 'Ver Aquecimento', time: 30 } },
             { id: 't3_b1', type: 'biset', title: 'Bloco 1', items: [{ name: 'Agachamento Búlgaro', details: '3x 8/perna' }, { name: 'Supino Máquina', details: '3x 10 reps' }], restTime: 60 },
