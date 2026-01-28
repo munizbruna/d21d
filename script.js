@@ -27,7 +27,7 @@ const provider = new GoogleAuthProvider();
 const EMAIL_AUTORIZADO = "bompatricio@gmail.com"; 
 
 // --- 2. DADOS DO TREINO (WORKOUT PLAN) ---
-const DEFAULT_VIDEO = "./videos/c225a2e2c990a187487b8cff1196bdb8c5cd8fc6";
+const DEFAULT_VIDEO = "./videos/c225a2e2c990a187487b8cff1196bdb8c5cd8fc6.mp4";
 
 const EXERCISE_TIPS = {
     'Afundo': "Dê um passo largo. Desça o joelho de trás em direção ao chão. Tronco reto.",
@@ -78,7 +78,7 @@ const WORKOUT_PLAN = {
     2: {
         title: "Treino 2: Superior",
         description: "Foco: Braços, Costas e Peito",
-        videoUrl: "./videos/534de5735e8c96e59bb0b321e5e173e86decda91",
+        videoUrl: "./videos/534de5735e8c96e59bb0b321e5e173e86decda91.mp4",
         segments: [{ time: 0, label: "Aula Completa", sub: "Reproduzir do início", icon: "play", color: "pink" }],
         exercises: [
             { id: 't2_aq', type: 'single', title: 'Aquecimento', items: [{ name: 'Mobilidade Geral', details: '3x 20s' }], restTime: 0, specialAction: { label: 'Ver Aquecimento', time: 0 } },
@@ -92,7 +92,7 @@ const WORKOUT_PLAN = {
     3: {
         title: "Treino 3: Full Body",
         description: "Pernas + Ombros e Costas",
-        videoUrl: "./videos/c225a2e2c990a187487b8cff1196bdb8c5cd8fc6",
+        videoUrl: "./videos/c225a2e2c990a187487b8cff1196bdb8c5cd8fc6.mp4",
         exercises: [
             { id: 't3_aq', type: 'single', title: 'Aquecimento', items: [{ name: 'Desenv + Agach + Chão', details: '3x (5+10+15)' }], restTime: 0, specialAction: { label: 'Ver Aquecimento', time: 30 } },
             { id: 't3_b1', type: 'biset', title: 'Bloco 1', items: [{ name: 'Agachamento Búlgaro', details: '3x 8/perna' }, { name: 'Supino Máquina', details: '3x 10 reps' }], restTime: 60 },
