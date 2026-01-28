@@ -27,7 +27,7 @@ const provider = new GoogleAuthProvider();
 const EMAIL_AUTORIZADO = "bompatricio@gmail.com"; 
 
 // --- 2. DADOS DO TREINO (WORKOUT PLAN) ---
-const DEFAULT_VIDEO = "https://stream.scaleup.com.br/player/v1/playlists/534de5735e8c96e59bb0b321e5e173e86decda91?URLPrefix=1767625456&Expires=1767625456&Signature=c4f1bd100b6b7af4eea65a45252a7cb2545e61c7&accessToken=40db2850-a983-31f0-bca0-73ac7c9efd86";
+const DEFAULT_VIDEO = "./videos/c225a2e2c990a187487b8cff1196bdb8c5cd8fc6";
 
 const EXERCISE_TIPS = {
     'Afundo': "Dê um passo largo. Desça o joelho de trás em direção ao chão. Tronco reto.",
