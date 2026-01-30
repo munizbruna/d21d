@@ -111,7 +111,7 @@ const WORKOUT_PLAN = {
     5: {
         title: "Treino 5: Pirâmide",
         description: "Reps 20-16-12-8",
-        videoUrl: DEFAULT_VIDEO,
+        videoUrl: "https://stream.scaleup.com.br/player/v1/playlists/a9bf5dbf58eef4fe4b1f89721e1c9d8b01fac0c9?URLPrefix=1770388159&Expires=1770388159&Signature=ff931156c8701011f77dc047e401560d386b3bf7&accessToken=edd1bfea-fb18-3521-ad97-4a854cb99ff1&authorization=eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ7XCJhY2Nlc3NUb2tlblwiOlwiNmY0YWY0NmItZjhmZC0zZTIzLWI4NzMtNzZlYWRlZWY5YWMxXCIsXCJ1c2VyQWdlbnRcIjpcImF4aW9zLzEuNC4wXCIsXCJjdXN0b21lckNvZGVcIjpcImQzYTIwYjY5LTkzYTItMzBhYS05NGUzLTEwZWJjZGNjN2NmZlwiLFwiaXBcIjpcIjMuOTQuMTM4LjE3XCIsXCJ1c2VyXCI6e1wiaWRcIjoxMjUxOCxcImNvZGVcIjpcIjM4YmEzNDQyMDI1ZjRlYjZkNTNmODY0NDViNjQ4OTU2ZmQ2YzI4YmVcIixcIm9wZXJhdG9yXCI6ZmFsc2UsXCJvcGVyYXRvclVzZXJKdXN0Q3JlYXRlZFwiOmZhbHNlfSxcImNyZWF0ZWRBdFwiOlwiMjAyNi0wMS0zMFQxMToyOToxOS44NjVcIixcImV4cGlyZWRBdFwiOlwiMjAyNi0wMi0wMlQxMToyOToxOS44NjVcIn0iLCJleHAiOjE3NzAzODgxNTksImlhdCI6MTc2OTc4MzM1OX0.BD95fQPn3WqhZKfVNJMatxb0yFVHdNgvnYhZLkNL0Jt3C79LEmgtixNMX3OC2L_mSpeltzwWwIiB-iGs-0LZDQ",
         exercises: [
             { id: 't5_main', type: 'single', title: 'Série Gigante', items: [{ name: 'Agachamento Sumô', details: 'Descrescente' }, { name: 'Leg Press', details: 'Descrescente' }, { name: 'Panturrilha', details: 'Descrescente' }, { name: 'Agachamento Iso', details: '20 seg fim' }], restTime: 60 },
             { id: 't5_fim', type: 'single', title: 'Cardio', items: [{ name: 'Intervalado 10min', details: '1min Forte/Leve' }], restTime: 0 }
