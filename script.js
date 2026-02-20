@@ -27,7 +27,7 @@ const provider = new GoogleAuthProvider();
 const EMAIL_AUTORIZADO = "bompatricio@gmail.com"; 
 
 // --- 2. DADOS DO TREINO (WORKOUT PLAN) ---
-const DEFAULT_VIDEO = "https://drive.google.com/file/d/17KXi1ISP_lyfhTjuHiJcp6iKeYd-O3JE/view?usp=sharing";
+const DEFAULT_VIDEO = "https://senaichamados.blob.core.windows.net/treinos/treino01.mp4";
 
 const EXERCISE_TIPS = {
     'Afundo': "Dê um passo largo. Desça o joelho de trás em direção ao chão. Tronco reto.",
