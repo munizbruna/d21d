@@ -535,15 +535,22 @@ window.saveExerciseData = async (exId, data) => {
     const user = auth.currentUser;
     if (!user) return;
 
-    const today = new Date().toLocaleDateString('pt-BR');
+    const dateObj = new Date();
+    const todayBR = dateObj.toLocaleDateString('pt-BR');
+    const dateKey = dateObj.toISOString().split('T')[0]; // Ex: 2026-02-20
     
     const localKey = `gym_data_${exId}`;
     const currentLocal = JSON.parse(localStorage.getItem(localKey) || '{}');
-    const updated = { ...currentLocal, ...data, lastUpdate: today };
+    const updated = { ...currentLocal, ...data, lastUpdate: todayBR };
     localStorage.setItem(localKey, JSON.stringify(updated));
 
     try {
+        // Mantém o estado atual para sincronização de "último treino"
         await set(ref(db, `users/${user.uid}/exercises/${exId}`), updated);
+        
+        // Cria um log histórico no Firebase organizado pela data do treino
+        await set(ref(db, `users/${user.uid}/history/${dateKey}/${exId}`), updated);
+        
         console.log(`Dados salvos: ${exId}`);
     } catch (error) {
         console.error("Erro ao salvar no Firebase:", error);
@@ -551,7 +558,16 @@ window.saveExerciseData = async (exId, data) => {
 };
 
 window.getExerciseData = (exId) => {
-    return JSON.parse(localStorage.getItem(`gym_data_${exId}`) || '{}');
+    const data = JSON.parse(localStorage.getItem(`gym_data_${exId}`) || '{}');
+    const todayBR = new Date().toLocaleDateString('pt-BR');
+    
+    // Se a última atualização não foi hoje, o exercício não está concluído hoje.
+    // Isso renova a tela diariamente, mas mantém os pesos preenchidos.
+    if (data.lastUpdate && data.lastUpdate !== todayBR) {
+        data.done = false;
+    }
+    
+    return data;
 };
 
 async function syncDataFromFirebase() {
