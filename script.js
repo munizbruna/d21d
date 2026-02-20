@@ -59,7 +59,7 @@ const WORKOUT_PLAN = {
     1: {
         title: "Treino 1: Inferior",
         description: "Foco: Pernas e Glúteos + Cardio",
-        videoUrl: "https://d21d.blob.core.windows.net/treinos/treino01.mp4",
+        videoUrl: "https://youtu.be/CZmV5yqQZBc",
         segments: [
             { time: 0, label: "Aquecimento", sub: "00:00 - 01:02", icon: "move", color: "pink" },
             { time: 62, label: "Bloco 1", sub: "01:02 - 02:20", icon: "list-video", color: "blue" },
@@ -103,7 +103,7 @@ const WORKOUT_PLAN = {
     2: {
         title: "Treino 2: Superior",
         description: "Foco: Braços, Costas e Peito",
-        videoUrl: "https://d21d.blob.core.windows.net/treinos/treino02.mp4",
+        videoUrl: "https://youtu.be/UpNMgqa1OQY",
         segments: [{ time: 0, label: "Aula Completa", sub: "Reproduzir do início", icon: "play", color: "pink" }],
         exercises: [
             { id: 't2_aq', type: 'single', title: 'Aquecimento', summary: 'Resumo pendente de análise do vídeo.', items: [{ name: 'Mobilidade Geral', details: '3x 20s' }], restTime: 0, specialAction: { label: 'Ver Explicação (00:00)', time: 0 } },
@@ -117,7 +117,7 @@ const WORKOUT_PLAN = {
     3: {
         title: "Treino 3: Full Body",
         description: "Pernas + Ombros e Costas",
-        videoUrl: "https://d21d.blob.core.windows.net/treinos/treino03.mp4",
+        videoUrl: "https://youtu.be/134-0UCMkMM",
         exercises: [
             { id: 't3_aq', type: 'single', title: 'Aquecimento', summary: 'Resumo pendente de análise do vídeo.', items: [{ name: 'Desenv + Agach + Chão', details: '3x (5+10+15)' }], restTime: 0, specialAction: { label: 'Ver Explicação (00:00)', time: 0 } },
             { id: 't3_b1', type: 'biset', title: 'Bloco 1', summary: 'Resumo pendente de análise do vídeo.', items: [{ name: 'Agachamento Búlgaro', details: '3x 8/perna' }, { name: 'Supino Máquina', details: '3x 10 reps' }], restTime: 60, specialAction: { label: 'Ver Explicação (00:00)', time: 0 } },
