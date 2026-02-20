@@ -61,15 +61,43 @@ const WORKOUT_PLAN = {
         description: "Foco: Pernas e Glúteos + Cardio",
         videoUrl: "https://d21d.blob.core.windows.net/treinos/treino01.mp4",
         segments: [
-            { time: 30, label: "Mobilidade", sub: "00:30 - 01:35", icon: "move", color: "pink" },
-            { time: 95, label: "Instruções", sub: "A partir de 01:35", icon: "list-video", color: "blue" }
+            { time: 0, label: "Aquecimento", sub: "00:00 - 01:02", icon: "move", color: "pink" },
+            { time: 62, label: "Bloco 1", sub: "01:02 - 02:20", icon: "list-video", color: "blue" },
+            { time: 141, label: "Bloco 2", sub: "02:21 - 03:07", icon: "list-video", color: "blue" },
+            { time: 187, label: "Bloco 3", sub: "03:07 - 03:44", icon: "list-video", color: "blue" },
+            { time: 224, label: "Bloco Final", sub: "03:44 - 04:00", icon: "activity", color: "red" }
         ],
         exercises: [
-            { id: 't1_aq', type: 'single', title: 'Aquecimento', items: [{ name: 'Mobilidade Articular', details: 'Vídeo: 0:30 a 1:35' }], restTime: 0, specialAction: { label: 'Ver Mobilidade', time: 30 } },
-            { id: 't1_b1', type: 'biset', title: 'Bloco 1 - Conjugado', items: [{ name: 'Afundo (Peso do corpo)', details: '3x 5 cada perna' }, { name: 'Stiff com Halteres', details: '3x 12 reps' }], restTime: 45 },
-            { id: 't1_b2', type: 'biset', title: 'Bloco 2 - Conjugado', items: [{ name: 'Cadeira Flexora', details: '3x 12 reps' }, { name: 'Agachamento Halteres', details: '3x 10 reps' }], restTime: 60 },
-            { id: 't1_b3', type: 'biset', title: 'Bloco 3 - Conjugado', items: [{ name: 'Cadeira Abdutora', details: '3x 12 reps' }, { name: 'Elevação de Quadril', details: '3x 20 reps' }], restTime: 60 },
-            { id: 't1_fim', type: 'single', title: 'Finalizador', items: [{ name: 'Pedalada Forte/Leve', details: '8x (20s Forte + 10s Leve)' }], restTime: 0 }
+            { 
+                id: 't1_aq', type: 'single', title: 'Aquecimento', 
+                summary: 'Caminhada do Urso: Caminhar com as mãos até prancha (5x) e 10 shoulder taps na última. Agachamento Livre (15x). Repetir 3 vezes.',
+                items: [{ name: 'Caminhada do Urso', details: '5x + 10 taps' }, { name: 'Agachamento Livre', details: '15 reps' }], 
+                restTime: 0, specialAction: { label: 'Ver Explicação (00:00)', time: 0 } 
+            },
+            { 
+                id: 't1_b1', type: 'biset', title: 'Bloco 1 - Combinado', 
+                summary: 'Executar os dois exercícios sem descanso entre eles. Descanso máximo de 30 segundos ao final da série combinada.',
+                items: [{ name: 'Afundo (para trás)', details: '3x 5 cada perna' }, { name: 'Stiff com Halteres', details: '3x 12 reps' }], 
+                restTime: 30, specialAction: { label: 'Ver Explicação (01:02)', time: 62 } 
+            },
+            { 
+                id: 't1_b2', type: 'biset', title: 'Bloco 2 - Combinado', 
+                summary: 'Executar sem descanso entre os exercícios e máximo de 30 segundos de descanso ao final da série.',
+                items: [{ name: 'Cadeira Flexora', details: '3x Lados alternados' }, { name: 'Agachamento Halteres', details: '3x' }], 
+                restTime: 30, specialAction: { label: 'Ver Explicação (02:21)', time: 141 } 
+            },
+            { 
+                id: 't1_b3', type: 'biset', title: 'Bloco 3 - Combinado', 
+                summary: 'Cadeira Abdutora mantendo o tronco reto. Elevação Pélvica subindo o quadril com potência e descendo devagar.',
+                items: [{ name: 'Cadeira Abdutora', details: '3x' }, { name: 'Elevação Pélvica', details: '3x' }], 
+                restTime: 30, specialAction: { label: 'Ver Explicação (03:07)', time: 187 } 
+            },
+            { 
+                id: 't1_fim', type: 'single', title: 'Bloco Final', 
+                summary: 'Treino intervalado de alta intensidade (Bicicleta ou Elíptico). 8 tiros.',
+                items: [{ name: 'Pedalada Forte/Leve', details: '8x (20s Forte + 10s Leve)' }], 
+                restTime: 0, specialAction: { label: 'Ver Explicação (03:44)', time: 224 } 
+            }
         ]
     },
     2: {
@@ -78,12 +106,12 @@ const WORKOUT_PLAN = {
         videoUrl: "https://d21d.blob.core.windows.net/treinos/treino02.mp4",
         segments: [{ time: 0, label: "Aula Completa", sub: "Reproduzir do início", icon: "play", color: "pink" }],
         exercises: [
-            { id: 't2_aq', type: 'single', title: 'Aquecimento', items: [{ name: 'Mobilidade Geral', details: '3x 20s' }], restTime: 0, specialAction: { label: 'Ver Aquecimento', time: 0 } },
-            { id: 't2_b1', type: 'biset', title: 'Bloco 1', items: [{ name: 'Flexão de Braço', details: '3x 5 reps' }, { name: 'Remada Curvada', details: '3x 10 reps' }], restTime: 60 },
-            { id: 't2_b2', type: 'biset', title: 'Bloco 2', items: [{ name: 'Supino Barra', details: '3x 10 reps' }, { name: 'Rosca Alternada', details: '3x 12 reps' }], restTime: 60 },
-            { id: 't2_b3', type: 'biset', title: 'Bloco 3', items: [{ name: 'Puxada Aberta', details: '3x 12 reps' }, { name: 'Tríceps Francês', details: '3x 8 reps' }], restTime: 60 },
-            { id: 't2_b4', type: 'biset', title: 'Bloco 4', items: [{ name: 'Crucifixo', details: '3x 10 reps' }, { name: 'Tríceps Banco', details: '3x 8 reps' }], restTime: 60 },
-            { id: 't2_fim', type: 'single', title: 'Core', items: [{ name: 'Prancha Abdominal', details: '4x Falha' }], restTime: 40 }
+            { id: 't2_aq', type: 'single', title: 'Aquecimento', summary: 'Resumo pendente de análise do vídeo.', items: [{ name: 'Mobilidade Geral', details: '3x 20s' }], restTime: 0, specialAction: { label: 'Ver Explicação (00:00)', time: 0 } },
+            { id: 't2_b1', type: 'biset', title: 'Bloco 1', summary: 'Resumo pendente de análise do vídeo.', items: [{ name: 'Flexão de Braço', details: '3x 5 reps' }, { name: 'Remada Curvada', details: '3x 10 reps' }], restTime: 60, specialAction: { label: 'Ver Explicação (00:00)', time: 0 } },
+            { id: 't2_b2', type: 'biset', title: 'Bloco 2', summary: 'Resumo pendente de análise do vídeo.', items: [{ name: 'Supino Barra', details: '3x 10 reps' }, { name: 'Rosca Alternada', details: '3x 12 reps' }], restTime: 60, specialAction: { label: 'Ver Explicação (00:00)', time: 0 } },
+            { id: 't2_b3', type: 'biset', title: 'Bloco 3', summary: 'Resumo pendente de análise do vídeo.', items: [{ name: 'Puxada Aberta', details: '3x 12 reps' }, { name: 'Tríceps Francês', details: '3x 8 reps' }], restTime: 60, specialAction: { label: 'Ver Explicação (00:00)', time: 0 } },
+            { id: 't2_b4', type: 'biset', title: 'Bloco 4', summary: 'Resumo pendente de análise do vídeo.', items: [{ name: 'Crucifixo', details: '3x 10 reps' }, { name: 'Tríceps Banco', details: '3x 8 reps' }], restTime: 60, specialAction: { label: 'Ver Explicação (00:00)', time: 0 } },
+            { id: 't2_fim', type: 'single', title: 'Core', summary: 'Resumo pendente de análise do vídeo.', items: [{ name: 'Prancha Abdominal', details: '4x Falha' }], restTime: 40, specialAction: { label: 'Ver Explicação (00:00)', time: 0 } }
         ]
     },
     3: {
@@ -91,27 +119,27 @@ const WORKOUT_PLAN = {
         description: "Pernas + Ombros e Costas",
         videoUrl: "https://d21d.blob.core.windows.net/treinos/treino03.mp4",
         exercises: [
-            { id: 't3_aq', type: 'single', title: 'Aquecimento', items: [{ name: 'Desenv + Agach + Chão', details: '3x (5+10+15)' }], restTime: 0, specialAction: { label: 'Ver Aquecimento', time: 30 } },
-            { id: 't3_b1', type: 'biset', title: 'Bloco 1', items: [{ name: 'Agachamento Búlgaro', details: '3x 8/perna' }, { name: 'Supino Máquina', details: '3x 10 reps' }], restTime: 60 },
-            { id: 't3_b2', type: 'biset', title: 'Bloco 2', items: [{ name: 'Remada Unilateral', details: '3x 8/braço' }, { name: 'Cadeira Extensora', details: '3x 10' }], restTime: 60 },
-            { id: 't3_b3', type: 'biset', title: 'Bloco 3', items: [{ name: 'Stiff Barra', details: '3x 12 reps' }, { name: 'Pull Down', details: '3x 10 reps' }], restTime: 60 },
-            { id: 't3_b4', type: 'biset', title: 'Bloco 4', items: [{ name: 'Agachamento Barra', details: '3x 12 reps' }, { name: 'Desenvolvimento', details: '3x 10 reps' }], restTime: 60 },
-            { id: 't3_fim', type: 'single', title: 'Final', items: [{ name: 'Burpee + Agach Salto', details: '5 Rounds' }], restTime: 0 }
+            { id: 't3_aq', type: 'single', title: 'Aquecimento', summary: 'Resumo pendente de análise do vídeo.', items: [{ name: 'Desenv + Agach + Chão', details: '3x (5+10+15)' }], restTime: 0, specialAction: { label: 'Ver Explicação (00:00)', time: 0 } },
+            { id: 't3_b1', type: 'biset', title: 'Bloco 1', summary: 'Resumo pendente de análise do vídeo.', items: [{ name: 'Agachamento Búlgaro', details: '3x 8/perna' }, { name: 'Supino Máquina', details: '3x 10 reps' }], restTime: 60, specialAction: { label: 'Ver Explicação (00:00)', time: 0 } },
+            { id: 't3_b2', type: 'biset', title: 'Bloco 2', summary: 'Resumo pendente de análise do vídeo.', items: [{ name: 'Remada Unilateral', details: '3x 8/braço' }, { name: 'Cadeira Extensora', details: '3x 10' }], restTime: 60, specialAction: { label: 'Ver Explicação (00:00)', time: 0 } },
+            { id: 't3_b3', type: 'biset', title: 'Bloco 3', summary: 'Resumo pendente de análise do vídeo.', items: [{ name: 'Stiff Barra', details: '3x 12 reps' }, { name: 'Pull Down', details: '3x 10 reps' }], restTime: 60, specialAction: { label: 'Ver Explicação (00:00)', time: 0 } },
+            { id: 't3_b4', type: 'biset', title: 'Bloco 4', summary: 'Resumo pendente de análise do vídeo.', items: [{ name: 'Agachamento Barra', details: '3x 12 reps' }, { name: 'Desenvolvimento', details: '3x 10 reps' }], restTime: 60, specialAction: { label: 'Ver Explicação (00:00)', time: 0 } },
+            { id: 't3_fim', type: 'single', title: 'Final', summary: 'Resumo pendente de análise do vídeo.', items: [{ name: 'Burpee + Agach Salto', details: '5 Rounds' }], restTime: 0, specialAction: { label: 'Ver Explicação (00:00)', time: 0 } }
         ]
     },
     4: {
         title: "Treino 4: Metabólico",
         description: "Queima Calórica e Resistência",
         videoUrl: "https://d21d.blob.core.windows.net/treinos/treino04.mp4",
-        exercises: [{ id: 't4_main', type: 'single', title: 'Circuito', items: [{ name: 'Cardio Moderado', details: '3 Min' }, { name: 'Agachamentos', details: '20 reps' }, { name: 'Abdominal Remador', details: '10 reps' }], restTime: 0, note: "Semana 1: 5 Rounds. Aumentar 1 round/sem." }]
+        exercises: [{ id: 't4_main', type: 'single', title: 'Circuito', summary: 'Resumo pendente de análise do vídeo.', items: [{ name: 'Cardio Moderado', details: '3 Min' }, { name: 'Agachamentos', details: '20 reps' }, { name: 'Abdominal Remador', details: '10 reps' }], restTime: 0, note: "Semana 1: 5 Rounds. Aumentar 1 round/sem.", specialAction: { label: 'Ver Explicação (00:00)', time: 0 } }]
     },
     5: {
         title: "Treino 5: Pirâmide",
         description: "Reps 20-16-12-8",
         videoUrl: "https://d21d.blob.core.windows.net/treinos/treino05.mp4",
         exercises: [
-            { id: 't5_main', type: 'single', title: 'Série Gigante', items: [{ name: 'Agachamento Sumô', details: 'Descrescente' }, { name: 'Leg Press', details: 'Descrescente' }, { name: 'Panturrilha', details: 'Descrescente' }, { name: 'Agachamento Iso', details: '20 seg fim' }], restTime: 60 },
-            { id: 't5_fim', type: 'single', title: 'Cardio', items: [{ name: 'Intervalado 10min', details: '1min Forte/Leve' }], restTime: 0 }
+            { id: 't5_main', type: 'single', title: 'Série Gigante', summary: 'Resumo pendente de análise do vídeo.', items: [{ name: 'Agachamento Sumô', details: 'Descrescente' }, { name: 'Leg Press', details: 'Descrescente' }, { name: 'Panturrilha', details: 'Descrescente' }, { name: 'Agachamento Iso', details: '20 seg fim' }], restTime: 60, specialAction: { label: 'Ver Explicação (00:00)', time: 0 } },
+            { id: 't5_fim', type: 'single', title: 'Cardio', summary: 'Resumo pendente de análise do vídeo.', items: [{ name: 'Intervalado 10min', details: '1min Forte/Leve' }], restTime: 0, specialAction: { label: 'Ver Explicação (00:00)', time: 0 } }
         ]
     },
     6: {
@@ -119,10 +147,10 @@ const WORKOUT_PLAN = {
         description: "Blocos 15-12-9 reps",
         videoUrl: "https://d21d.blob.core.windows.net/treinos/treino06.mp4",
         exercises: [
-            { id: 't6_b1', type: 'single', title: 'Bloco 1', items: [{ name: 'Supino + Martelo', details: '15-12-9 reps' }], restTime: 0 },
-            { id: 't6_b2', type: 'single', title: 'Bloco 2', items: [{ name: 'Remada + Testa', details: '15-12-9 reps' }], restTime: 0 },
-            { id: 't6_b3', type: 'single', title: 'Bloco 3', items: [{ name: 'Thruster + Abd', details: '15-12-9 reps' }], restTime: 0 },
-            { id: 't6_fim', type: 'single', title: 'Desafio', items: [{ name: 'Snatch + Crunch', details: '10-8-6-4-2' }], restTime: 0 }
+            { id: 't6_b1', type: 'single', title: 'Bloco 1', summary: 'Resumo pendente de análise do vídeo.', items: [{ name: 'Supino + Martelo', details: '15-12-9 reps' }], restTime: 0, specialAction: { label: 'Ver Explicação (00:00)', time: 0 } },
+            { id: 't6_b2', type: 'single', title: 'Bloco 2', summary: 'Resumo pendente de análise do vídeo.', items: [{ name: 'Remada + Testa', details: '15-12-9 reps' }], restTime: 0, specialAction: { label: 'Ver Explicação (00:00)', time: 0 } },
+            { id: 't6_b3', type: 'single', title: 'Bloco 3', summary: 'Resumo pendente de análise do vídeo.', items: [{ name: 'Thruster + Abd', details: '15-12-9 reps' }], restTime: 0, specialAction: { label: 'Ver Explicação (00:00)', time: 0 } },
+            { id: 't6_fim', type: 'single', title: 'Desafio', summary: 'Resumo pendente de análise do vídeo.', items: [{ name: 'Snatch + Crunch', details: '10-8-6-4-2' }], restTime: 0, specialAction: { label: 'Ver Explicação (00:00)', time: 0 } }
         ]
     },
     7: {
@@ -130,10 +158,10 @@ const WORKOUT_PLAN = {
         description: "4 Séries de 15 Repetições",
         videoUrl: "https://d21d.blob.core.windows.net/treinos/treino07.mp4",
         exercises: [
-            { id: 't7_b1', type: 'biset', title: 'Bloco 1', items: [{ name: 'Cadeira Extensora', details: '4x 15' }, { name: 'Puxada Aberta', details: '4x 15' }], restTime: 60 },
-            { id: 't7_b2', type: 'biset', title: 'Bloco 2', items: [{ name: 'Levantamento Terra', details: '4x 15' }, { name: 'Tríceps Corda', details: '4x 15' }], restTime: 60 },
-            { id: 't7_b3', type: 'biset', title: 'Bloco 3', items: [{ name: 'Cadeira Flexora', details: '4x 15' }, { name: 'Remada Baixa', details: '4x 15' }], restTime: 60 },
-            { id: 't7_fim', type: 'single', title: 'Final', items: [{ name: 'Agach Salto + Tap', details: '30-20-10' }], restTime: 0 }
+            { id: 't7_b1', type: 'biset', title: 'Bloco 1', summary: 'Resumo pendente de análise do vídeo.', items: [{ name: 'Cadeira Extensora', details: '4x 15' }, { name: 'Puxada Aberta', details: '4x 15' }], restTime: 60, specialAction: { label: 'Ver Explicação (00:00)', time: 0 } },
+            { id: 't7_b2', type: 'biset', title: 'Bloco 2', summary: 'Resumo pendente de análise do vídeo.', items: [{ name: 'Levantamento Terra', details: '4x 15' }, { name: 'Tríceps Corda', details: '4x 15' }], restTime: 60, specialAction: { label: 'Ver Explicação (00:00)', time: 0 } },
+            { id: 't7_b3', type: 'biset', title: 'Bloco 3', summary: 'Resumo pendente de análise do vídeo.', items: [{ name: 'Cadeira Flexora', details: '4x 15' }, { name: 'Remada Baixa', details: '4x 15' }], restTime: 60, specialAction: { label: 'Ver Explicação (00:00)', time: 0 } },
+            { id: 't7_fim', type: 'single', title: 'Final', summary: 'Resumo pendente de análise do vídeo.', items: [{ name: 'Agach Salto + Tap', details: '30-20-10' }], restTime: 0, specialAction: { label: 'Ver Explicação (00:00)', time: 0 } }
         ]
     }
 };
@@ -229,6 +257,11 @@ window.renderWorkout = function(key) {
         const stored = window.getExerciseData(ex.id);
         const isDone = stored.done;
 
+        let summaryHtml = '';
+        if(ex.summary) {
+            summaryHtml = `<p class="text-sm text-slate-500 mb-4 leading-relaxed">${ex.summary}</p>`;
+        }
+
         let itemsHtml = '';
         ex.items.forEach((item, idx) => {
             const savedW = stored.items?.[idx]?.w || '';
@@ -270,6 +303,7 @@ window.renderWorkout = function(key) {
                     <span class="badge-bi">${ex.title}</span>
                     ${ex.restTime > 0 ? `<span class="text-xs font-bold text-slate-400 flex items-center gap-1 bg-slate-50 px-2 py-1 rounded-lg"><i data-lucide="clock" width="12"></i> ${ex.restTime}s</span>` : ''}
                 </div>
+                ${summaryHtml}
                 ${ex.note ? `<div class="mb-4 bg-amber-50 text-amber-700 text-xs font-medium p-3 rounded-xl border border-amber-100 flex gap-2 items-start"><i data-lucide="alert-triangle" width="14" class="shrink-0 mt-0.5"></i> ${ex.note}</div>` : ''}
                 <div>${itemsHtml}</div>
                 ${specialActionHtml}
@@ -416,8 +450,6 @@ function pauseTimer() {
 }
 
 // Configurar o botão de reset do timer
-// Nota: getElementById pode não estar pronto se o script rodar antes do HTML, 
-// mas como é module, roda deferido.
 const btnReset = document.getElementById('btn-reset-timer');
 if(btnReset) {
     btnReset.onclick = () => {
@@ -468,7 +500,6 @@ onAuthStateChanged(auth, (user) => {
     if (user && user.email === EMAIL_AUTORIZADO) {
         console.log("Acesso concedido para:", user.email);
         syncDataFromFirebase().then(() => {
-            // Agora renderHome JÁ EXISTE e pode ser chamada
             if (window.renderHome) window.renderHome();
         });
     } else {
