@@ -26,9 +26,6 @@ const provider = new GoogleAuthProvider();
 
 const EMAIL_AUTORIZADO = "bompatricio@gmail.com"; 
 
-// --- 2. DADOS DO TREINO (WORKOUT PLAN) ---
-const DEFAULT_VIDEO = `https://d21d.blob.core.windows.net/treinos/treino0{WORKOUT_PLAN.id}.mp4`;
-
 const EXERCISE_TIPS = {
     'Afundo': "Dê um passo largo. Desça o joelho de trás em direção ao chão. Tronco reto.",
     'Stiff': "Pés na largura do quadril. Joelhos semi-flexionados. Empine o glúteo.",
@@ -62,7 +59,7 @@ const WORKOUT_PLAN = {
     1: {
         title: "Treino 1: Inferior",
         description: "Foco: Pernas e Glúteos + Cardio",
-        videoUrl: DEFAULT_VIDEO,
+        videoUrl: "https://d21d.blob.core.windows.net/treinos/treino01.mp4",
         segments: [
             { time: 30, label: "Mobilidade", sub: "00:30 - 01:35", icon: "move", color: "pink" },
             { time: 95, label: "Instruções", sub: "A partir de 01:35", icon: "list-video", color: "blue" }
@@ -78,7 +75,7 @@ const WORKOUT_PLAN = {
     2: {
         title: "Treino 2: Superior",
         description: "Foco: Braços, Costas e Peito",
-        videoUrl: DEFAULT_VIDEO,
+        videoUrl: "https://d21d.blob.core.windows.net/treinos/treino02.mp4",
         segments: [{ time: 0, label: "Aula Completa", sub: "Reproduzir do início", icon: "play", color: "pink" }],
         exercises: [
             { id: 't2_aq', type: 'single', title: 'Aquecimento', items: [{ name: 'Mobilidade Geral', details: '3x 20s' }], restTime: 0, specialAction: { label: 'Ver Aquecimento', time: 0 } },
@@ -92,7 +89,7 @@ const WORKOUT_PLAN = {
     3: {
         title: "Treino 3: Full Body",
         description: "Pernas + Ombros e Costas",
-        videoUrl: DEFAULT_VIDEO,
+        videoUrl: "https://d21d.blob.core.windows.net/treinos/treino03.mp4",
         exercises: [
             { id: 't3_aq', type: 'single', title: 'Aquecimento', items: [{ name: 'Desenv + Agach + Chão', details: '3x (5+10+15)' }], restTime: 0, specialAction: { label: 'Ver Aquecimento', time: 30 } },
             { id: 't3_b1', type: 'biset', title: 'Bloco 1', items: [{ name: 'Agachamento Búlgaro', details: '3x 8/perna' }, { name: 'Supino Máquina', details: '3x 10 reps' }], restTime: 60 },
@@ -105,13 +102,13 @@ const WORKOUT_PLAN = {
     4: {
         title: "Treino 4: Metabólico",
         description: "Queima Calórica e Resistência",
-        videoUrl: DEFAULT_VIDEO,
+        videoUrl: "https://d21d.blob.core.windows.net/treinos/treino04.mp4",
         exercises: [{ id: 't4_main', type: 'single', title: 'Circuito', items: [{ name: 'Cardio Moderado', details: '3 Min' }, { name: 'Agachamentos', details: '20 reps' }, { name: 'Abdominal Remador', details: '10 reps' }], restTime: 0, note: "Semana 1: 5 Rounds. Aumentar 1 round/sem." }]
     },
     5: {
         title: "Treino 5: Pirâmide",
         description: "Reps 20-16-12-8",
-        videoUrl: DEFAULT_VIDEO,
+        videoUrl: "https://d21d.blob.core.windows.net/treinos/treino05.mp4",
         exercises: [
             { id: 't5_main', type: 'single', title: 'Série Gigante', items: [{ name: 'Agachamento Sumô', details: 'Descrescente' }, { name: 'Leg Press', details: 'Descrescente' }, { name: 'Panturrilha', details: 'Descrescente' }, { name: 'Agachamento Iso', details: '20 seg fim' }], restTime: 60 },
             { id: 't5_fim', type: 'single', title: 'Cardio', items: [{ name: 'Intervalado 10min', details: '1min Forte/Leve' }], restTime: 0 }
@@ -120,7 +117,7 @@ const WORKOUT_PLAN = {
     6: {
         title: "Treino 6: Força",
         description: "Blocos 15-12-9 reps",
-        videoUrl: DEFAULT_VIDEO,
+        videoUrl: "https://d21d.blob.core.windows.net/treinos/treino06.mp4",
         exercises: [
             { id: 't6_b1', type: 'single', title: 'Bloco 1', items: [{ name: 'Supino + Martelo', details: '15-12-9 reps' }], restTime: 0 },
             { id: 't6_b2', type: 'single', title: 'Bloco 2', items: [{ name: 'Remada + Testa', details: '15-12-9 reps' }], restTime: 0 },
@@ -131,7 +128,7 @@ const WORKOUT_PLAN = {
     7: {
         title: "Treino 7: Full Body",
         description: "4 Séries de 15 Repetições",
-        videoUrl: DEFAULT_VIDEO,
+        videoUrl: "https://d21d.blob.core.windows.net/treinos/treino07.mp4",
         exercises: [
             { id: 't7_b1', type: 'biset', title: 'Bloco 1', items: [{ name: 'Cadeira Extensora', details: '4x 15' }, { name: 'Puxada Aberta', details: '4x 15' }], restTime: 60 },
             { id: 't7_b2', type: 'biset', title: 'Bloco 2', items: [{ name: 'Levantamento Terra', details: '4x 15' }, { name: 'Tríceps Corda', details: '4x 15' }], restTime: 60 },
