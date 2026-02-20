@@ -332,13 +332,35 @@ window.openVideoModal = function(startTime = 0) {
     const segmentsContainer = document.getElementById('video-segments-container');
     
     const currentPlan = WORKOUT_PLAN[currentWorkoutKey];
-    const videoUrl = currentPlan?.videoUrl || DEFAULT_VIDEO;
+    const rawUrl = currentPlan?.videoUrl || '';
     
-    const timeParam = startTime > 0 ? `&t=${startTime}` : ''; 
-    const finalUrl = videoUrl + timeParam;
+    let finalUrl = rawUrl;
+    
+    // Converte links do YouTube para formato Embed
+    if (rawUrl.includes('youtu.be') || rawUrl.includes('youtube.com')) {
+        let videoId = '';
+        if (rawUrl.includes('youtu.be/')) {
+            videoId = rawUrl.split('youtu.be/')[1].split('?')[0];
+        } else if (rawUrl.includes('youtube.com/watch?v=')) {
+            videoId = rawUrl.split('v=')[1].split('&')[0];
+        }
+        
+        // Formato Embed do YouTube com os parâmetros necessários
+        finalUrl = `https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1`;
+        if (startTime > 0) {
+            finalUrl += `&start=${startTime}`;
+        }
+        // Autoplay ativado pois o usuário clicou ativamente para abrir o modal
+        finalUrl += `&autoplay=1`;
+    } else {
+        // Lógica para vídeos normais no formato mp4
+        if (startTime > 0) {
+            finalUrl += `#t=${startTime}`;
+        }
+    }
     
     iframe.src = finalUrl;
-    link.href = finalUrl;
+    link.href = rawUrl;
     
     if (startTime > 0) {
         subtitle.innerText = `Iniciando em ${formatTime(startTime)}`;
