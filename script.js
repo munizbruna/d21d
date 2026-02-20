@@ -27,7 +27,7 @@ const provider = new GoogleAuthProvider();
 const EMAIL_AUTORIZADO = "bompatricio@gmail.com"; 
 
 // --- 2. DADOS DO TREINO (WORKOUT PLAN) ---
-const DEFAULT_VIDEO = "https://senaichamados.blob.core.windows.net/treinos/treino01.mp4";
+const DEFAULT_VIDEO = `https://d21d.blob.core.windows.net/treinos/treino0{WORKOUT_PLAN.id}.mp4`;
 
 const EXERCISE_TIPS = {
     'Afundo': "Dê um passo largo. Desça o joelho de trás em direção ao chão. Tronco reto.",
@@ -78,7 +78,7 @@ const WORKOUT_PLAN = {
     2: {
         title: "Treino 2: Superior",
         description: "Foco: Braços, Costas e Peito",
-        videoUrl: "./videos/534de5735e8c96e59bb0b321e5e173e86decda91.mp4",
+        videoUrl: DEFAULT_VIDEO,
         segments: [{ time: 0, label: "Aula Completa", sub: "Reproduzir do início", icon: "play", color: "pink" }],
         exercises: [
             { id: 't2_aq', type: 'single', title: 'Aquecimento', items: [{ name: 'Mobilidade Geral', details: '3x 20s' }], restTime: 0, specialAction: { label: 'Ver Aquecimento', time: 0 } },
@@ -92,7 +92,7 @@ const WORKOUT_PLAN = {
     3: {
         title: "Treino 3: Full Body",
         description: "Pernas + Ombros e Costas",
-        videoUrl: "https://stream.scaleup.com.br/player/v1/playlists/c225a2e2c990a187487b8cff1196bdb8c5cd8fc6?URLPrefix=1770215407&Expires=1770215407&Signature=0fcc3dc399d49e88c0f7e98b5a36e8b591a569f3&accessToken=2d33923c-a6b0-36d1-ae3f-2fe71d2f15b6&authorization=eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ7XCJhY2Nlc3NUb2tlblwiOlwiN2YxMWYzNDItMjRjNy0zZWU3LThiNjQtNzc5ZGJmOTU2NTBhXCIsXCJ1c2VyQWdlbnRcIjpcImF4aW9zLzEuNC4wXCIsXCJjdXN0b21lckNvZGVcIjpcImZjNmIxMmU5LWNmZGMtMzYxYS1iZWUwLTY1MjI0YzJjZjFjY1wiLFwiaXBcIjpcIjMuOTQuMTM4LjE3XCIsXCJ1c2VyXCI6e1wiaWRcIjoxMjUxOCxcImNvZGVcIjpcIjM4YmEzNDQyMDI1ZjRlYjZkNTNmODY0NDViNjQ4OTU2ZmQ2YzI4YmVcIixcIm9wZXJhdG9yXCI6ZmFsc2UsXCJvcGVyYXRvclVzZXJKdXN0Q3JlYXRlZFwiOmZhbHNlfSxcImNyZWF0ZWRBdFwiOlwiMjAyNi0wMS0yOFQxMTozMDowNy4yODJcIixcImV4cGlyZWRBdFwiOlwiMjAyNi0wMS0zMVQxMTozMDowNy4yODJcIn0iLCJleHAiOjE3NzAyMTU0MDcsImlhdCI6MTc2OTYxMDYwN30.yiCrpdJZNLJPzCTpvM40r-rOWU0gwQzFx0YvQMIQtgyCnbNKkcgtoTjpRCfynX7zoqhbV_BMUziLE68ar8bU8g",
+        videoUrl: DEFAULT_VIDEO,
         exercises: [
             { id: 't3_aq', type: 'single', title: 'Aquecimento', items: [{ name: 'Desenv + Agach + Chão', details: '3x (5+10+15)' }], restTime: 0, specialAction: { label: 'Ver Aquecimento', time: 30 } },
             { id: 't3_b1', type: 'biset', title: 'Bloco 1', items: [{ name: 'Agachamento Búlgaro', details: '3x 8/perna' }, { name: 'Supino Máquina', details: '3x 10 reps' }], restTime: 60 },
@@ -111,7 +111,7 @@ const WORKOUT_PLAN = {
     5: {
         title: "Treino 5: Pirâmide",
         description: "Reps 20-16-12-8",
-        videoUrl: "https://stream.scaleup.com.br/player/v1/playlists/a9bf5dbf58eef4fe4b1f89721e1c9d8b01fac0c9?URLPrefix=1770388159&Expires=1770388159&Signature=ff931156c8701011f77dc047e401560d386b3bf7&accessToken=edd1bfea-fb18-3521-ad97-4a854cb99ff1&authorization=eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ7XCJhY2Nlc3NUb2tlblwiOlwiNmY0YWY0NmItZjhmZC0zZTIzLWI4NzMtNzZlYWRlZWY5YWMxXCIsXCJ1c2VyQWdlbnRcIjpcImF4aW9zLzEuNC4wXCIsXCJjdXN0b21lckNvZGVcIjpcImQzYTIwYjY5LTkzYTItMzBhYS05NGUzLTEwZWJjZGNjN2NmZlwiLFwiaXBcIjpcIjMuOTQuMTM4LjE3XCIsXCJ1c2VyXCI6e1wiaWRcIjoxMjUxOCxcImNvZGVcIjpcIjM4YmEzNDQyMDI1ZjRlYjZkNTNmODY0NDViNjQ4OTU2ZmQ2YzI4YmVcIixcIm9wZXJhdG9yXCI6ZmFsc2UsXCJvcGVyYXRvclVzZXJKdXN0Q3JlYXRlZFwiOmZhbHNlfSxcImNyZWF0ZWRBdFwiOlwiMjAyNi0wMS0zMFQxMToyOToxOS44NjVcIixcImV4cGlyZWRBdFwiOlwiMjAyNi0wMi0wMlQxMToyOToxOS44NjVcIn0iLCJleHAiOjE3NzAzODgxNTksImlhdCI6MTc2OTc4MzM1OX0.BD95fQPn3WqhZKfVNJMatxb0yFVHdNgvnYhZLkNL0Jt3C79LEmgtixNMX3OC2L_mSpeltzwWwIiB-iGs-0LZDQ",
+        videoUrl: DEFAULT_VIDEO,
         exercises: [
             { id: 't5_main', type: 'single', title: 'Série Gigante', items: [{ name: 'Agachamento Sumô', details: 'Descrescente' }, { name: 'Leg Press', details: 'Descrescente' }, { name: 'Panturrilha', details: 'Descrescente' }, { name: 'Agachamento Iso', details: '20 seg fim' }], restTime: 60 },
             { id: 't5_fim', type: 'single', title: 'Cardio', items: [{ name: 'Intervalado 10min', details: '1min Forte/Leve' }], restTime: 0 }
