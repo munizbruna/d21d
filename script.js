@@ -188,6 +188,9 @@ window.renderHome = function() {
                     <h1 class="text-2xl font-bold tracking-tight">Olá, Bruna!</h1>
                 </div>
                 <div class="flex gap-2">
+                    <button onclick="renderProgress()" class="p-2.5 bg-white/10 rounded-full hover:bg-white/20 transition-all border border-white/5 flex items-center justify-center">
+                        <i data-lucide="bar-chart-2" width="18"></i>
+                    </button>
                     <a href="https://fithome.cademi.com.br/auth/login?redirect=%2F" target="_blank" class="p-2.5 bg-white/10 rounded-full hover:bg-white/20 transition-all border border-white/5 flex items-center justify-center">
                         <i data-lucide="external-link" width="18"></i>
                     </a>
@@ -230,6 +233,80 @@ window.renderHome = function() {
     html += `</div>`;
     appDiv.innerHTML = html;
     if(window.lucide) lucide.createIcons();
+};
+
+window.renderProgress = function() {
+    const appDiv = document.getElementById('app');
+    const historyData = JSON.parse(localStorage.getItem('gym_history') || '{}');
+    
+    const dates = Object.keys(historyData).sort((a,b) => new Date(b) - new Date(a));
+    let totalWorkouts = 0;
+    let recentActivityHtml = '';
+
+    if(dates.length === 0) {
+        recentActivityHtml = `<p class="text-slate-500 text-sm text-center py-8">Nenhum treino concluído ainda.</p>`;
+    } else {
+        dates.forEach(date => {
+            const dayData = historyData[date];
+            const exercisesDone = Object.keys(dayData).filter(exId => dayData[exId].done);
+            
+            if(exercisesDone.length > 0) {
+                totalWorkouts++;
+                
+                // Formatação simples da data
+                const dateObj = new Date(date);
+                dateObj.setMinutes(dateObj.getMinutes() + dateObj.getTimezoneOffset());
+                const formattedDate = dateObj.toLocaleDateString('pt-BR');
+
+                recentActivityHtml += `
+                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 mb-3">
+                        <div class="flex items-center gap-3 mb-1">
+                            <div class="bg-pink-100 text-pink-600 p-2 rounded-lg"><i data-lucide="calendar-check" width="18"></i></div>
+                            <div>
+                                <h4 class="font-bold text-slate-700 text-sm">${formattedDate}</h4>
+                                <p class="text-xs text-slate-500 font-medium">${exercisesDone.length} blocos registrados</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+        });
+    }
+
+    let html = `
+        <div class="bg-white/90 backdrop-blur-md sticky top-0 z-30 px-4 py-4 flex items-center justify-between border-b border-slate-100 shadow-sm">
+            <button onclick="renderHome()" class="p-2 -ml-2 text-slate-600 hover:bg-slate-100 rounded-full transition-colors">
+                <i data-lucide="arrow-left" width="22"></i>
+            </button>
+            <div class="text-center">
+                <h1 class="font-bold text-base text-slate-800">Meu Progresso</h1>
+            </div>
+            <div class="w-8"></div>
+        </div>
+
+        <div class="p-5 space-y-6 fade-in pb-32 pt-6">
+            <div class="grid grid-cols-2 gap-4">
+                <div class="bg-gradient-to-br from-pink-500 to-pink-600 p-5 rounded-3xl text-white shadow-lg shadow-pink-500/30">
+                    <i data-lucide="flame" width="24" class="mb-2 opacity-80"></i>
+                    <div class="text-3xl font-black mb-1">${totalWorkouts}</div>
+                    <div class="text-xs font-bold uppercase tracking-wider opacity-90">Dias Treinados</div>
+                </div>
+                <div class="bg-white border border-slate-100 p-5 rounded-3xl text-slate-800 shadow-sm">
+                    <i data-lucide="activity" width="24" class="mb-2 text-blue-500"></i>
+                    <div class="text-3xl font-black mb-1">${dates.length > 0 ? Object.keys(historyData[dates[0]]).filter(k => historyData[dates[0]][k].done).length : 0}</div>
+                    <div class="text-xs font-bold uppercase tracking-wider text-slate-400">Último Treino</div>
+                </div>
+            </div>
+
+            <div>
+                <h3 class="font-bold text-slate-400 text-xs uppercase tracking-wider mb-3 pl-2">Histórico de Atividades</h3>
+                ${recentActivityHtml || '<p class="text-sm text-slate-500 pl-2">Complete blocos de exercícios para ver seu histórico.</p>'}
+            </div>
+        </div>
+    `;
+    appDiv.innerHTML = html;
+    if(window.lucide) lucide.createIcons();
+    window.scrollTo(0,0);
 };
 
 window.renderWorkout = function(key) {
@@ -336,7 +413,6 @@ window.openVideoModal = function(startTime = 0) {
     
     let finalUrl = rawUrl;
     
-    // Converte links do YouTube para formato Embed
     if (rawUrl.includes('youtu.be') || rawUrl.includes('youtube.com')) {
         let videoId = '';
         if (rawUrl.includes('youtu.be/')) {
@@ -345,15 +421,12 @@ window.openVideoModal = function(startTime = 0) {
             videoId = rawUrl.split('v=')[1].split('&')[0];
         }
         
-        // Formato Embed do YouTube com os parâmetros necessários
         finalUrl = `https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1`;
         if (startTime > 0) {
             finalUrl += `&start=${startTime}`;
         }
-        // Autoplay ativado pois o usuário clicou ativamente para abrir o modal
         finalUrl += `&autoplay=1`;
     } else {
-        // Lógica para vídeos normais no formato mp4
         if (startTime > 0) {
             finalUrl += `#t=${startTime}`;
         }
@@ -471,7 +544,6 @@ function pauseTimer() {
     btn.classList.remove('bg-slate-700');
 }
 
-// Configurar o botão de reset do timer
 const btnReset = document.getElementById('btn-reset-timer');
 if(btnReset) {
     btnReset.onclick = () => {
@@ -483,7 +555,7 @@ if(btnReset) {
     };
 }
 
-// --- 6. AUTH & LOGIN (LÓGICA ANTERIOR MANTIDA E REVISADA) ---
+// --- 6. AUTH & LOGIN ---
 
 function renderLoginScreen() {
     const appDiv = document.getElementById('app');
@@ -537,7 +609,7 @@ window.saveExerciseData = async (exId, data) => {
 
     const dateObj = new Date();
     const todayBR = dateObj.toLocaleDateString('pt-BR');
-    const dateKey = dateObj.toISOString().split('T')[0]; // Ex: 2026-02-20
+    const dateKey = dateObj.toISOString().split('T')[0];
     
     const localKey = `gym_data_${exId}`;
     const currentLocal = JSON.parse(localStorage.getItem(localKey) || '{}');
@@ -545,12 +617,15 @@ window.saveExerciseData = async (exId, data) => {
     localStorage.setItem(localKey, JSON.stringify(updated));
 
     try {
-        // Mantém o estado atual para sincronização de "último treino"
         await set(ref(db, `users/${user.uid}/exercises/${exId}`), updated);
-        
-        // Cria um log histórico no Firebase organizado pela data do treino
         await set(ref(db, `users/${user.uid}/history/${dateKey}/${exId}`), updated);
         
+        // Atualiza o histórico em memória local para visualização imediata no painel
+        const historyData = JSON.parse(localStorage.getItem('gym_history') || '{}');
+        if(!historyData[dateKey]) historyData[dateKey] = {};
+        historyData[dateKey][exId] = updated;
+        localStorage.setItem('gym_history', JSON.stringify(historyData));
+
         console.log(`Dados salvos: ${exId}`);
     } catch (error) {
         console.error("Erro ao salvar no Firebase:", error);
@@ -561,8 +636,6 @@ window.getExerciseData = (exId) => {
     const data = JSON.parse(localStorage.getItem(`gym_data_${exId}`) || '{}');
     const todayBR = new Date().toLocaleDateString('pt-BR');
     
-    // Se a última atualização não foi hoje, o exercício não está concluído hoje.
-    // Isso renova a tela diariamente, mas mantém os pesos preenchidos.
     if (data.lastUpdate && data.lastUpdate !== todayBR) {
         data.done = false;
     }
@@ -581,8 +654,14 @@ async function syncDataFromFirebase() {
             Object.keys(allData).forEach(exId => {
                 localStorage.setItem(`gym_data_${exId}`, JSON.stringify(allData[exId]));
             });
-            console.log("Sincronização completa.");
         }
+        
+        const histSnapshot = await get(ref(db, `users/${user.uid}/history`));
+        if (histSnapshot.exists()) {
+            localStorage.setItem('gym_history', JSON.stringify(histSnapshot.val()));
+        }
+        
+        console.log("Sincronização completa.");
     } catch (error) {
         console.error("Erro na sincronização:", error);
     }
