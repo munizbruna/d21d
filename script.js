@@ -772,7 +772,30 @@ window.closeTimerModal = function() {
     if(modal) modal.classList.add('hidden');
 };
 
-
+onAuthStateChanged(auth, (user) => {
+    const statusDiv = document.getElementById('connection-status');
+    if (user) {
+        if(statusDiv) {
+            statusDiv.textContent = "Conectado";
+            statusDiv.classList.add('show');
+            setTimeout(() => statusDiv.classList.remove('show'), 2000);
+        }
+        window.renderHome();
+    } else {
+        const appDiv = document.getElementById('app');
+        if(appDiv) {
+            appDiv.innerHTML = `
+                <div class="h-screen w-full flex flex-col items-center justify-center bg-slate-900 p-8 text-center">
+                    <h1 class="text-white text-2xl font-bold mb-4">Desafio D21D</h1>
+                    <p class="text-slate-400 mb-8">Faça login para acessar seus treinos e salvar seu progresso.</p>
+                    <button onclick="signInWithPopup(auth, provider)" class="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-4 rounded-xl shadow-lg">
+                        Entrar com Google
+                    </button>
+                </div>
+            `;
+        }
+    }
+});
 
 if(!auth.currentUser) {
     window.renderHome();
