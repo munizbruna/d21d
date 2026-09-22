@@ -6,7 +6,7 @@ import {
     onAuthStateChanged, 
     signOut 
 } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+import { getDatabase, ref, set, get, update } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
 
 // --- 1. CONFIGURAÇÃO DO FIREBASE ---
 const firebaseConfig = {
@@ -55,128 +55,297 @@ function getTip(name) {
     return key ? EXERCISE_TIPS[key] : "Mantenha a postura e concentre-se na execução.";
 }
 
+// Catálogo renomeado para A, B, C e D
 const WORKOUT_PLAN = {
-    1: {
-        title: "Treino 1: Inferior",
-        description: "Foco: Pernas e Glúteos + Cardio",
-        videoUrl: "https://youtu.be/CZmV5yqQZBc",
-        segments: [
-            { time: 0, label: "Aquecimento", sub: "00:00 - 01:02", icon: "move", color: "pink" },
-            { time: 62, label: "Bloco 1", sub: "01:02 - 02:20", icon: "list-video", color: "blue" },
-            { time: 141, label: "Bloco 2", sub: "02:21 - 03:07", icon: "list-video", color: "blue" },
-            { time: 187, label: "Bloco 3", sub: "03:07 - 03:44", icon: "list-video", color: "blue" },
-            { time: 224, label: "Bloco Final", sub: "03:44 - 04:00", icon: "activity", color: "red" }
-        ],
+    'A': {
+        title: "Treino A: Inferior (Anterior)",
+        description: "Foco: Quadríceps, Glúteo e Panturrilha",
+        videoUrl: "",
         exercises: [
             { 
-                id: 't1_aq', type: 'single', title: 'Aquecimento', 
-                summary: 'Caminhada do Urso: Caminhar com as mãos até prancha (5x) e 10 shoulder taps na última. Agachamento Livre (15x). Repetir 3 vezes.',
-                items: [{ name: 'Caminhada do Urso', details: '5x + 10 taps' }, { name: 'Agachamento Livre', details: '15 reps' }], 
-                restTime: 0, specialAction: { label: 'Ver Explicação (00:00)', time: 0 } 
+                id: 'ta_b1', 
+                type: 'biset', 
+                title: 'Bloco 1 - Base e Estabilidade', 
+                summary: 'O agachamento atua como construtor de força global para membros inferiores. O afundo, executado na sequência, recruta os estabilizadores do quadril e corrige assimetrias por ser unilateral. Faça a transição sem descanso.',
+                items: [
+                    { name: 'Agachamento (Livre ou Barra)', details: '3x 10 a 12 reps' }, 
+                    { name: 'Afundo', details: '3x 10 reps (cada perna)' }
+                ], 
+                restTime: 60, 
+                specialAction: { label: 'Registrar Execução', time: 0 } 
             },
             { 
-                id: 't1_b1', type: 'biset', title: 'Bloco 1 - Combinado', 
-                summary: 'Executar os dois exercícios sem descanso entre eles. Descanso máximo de 30 segundos ao final da série combinada.',
-                items: [{ name: 'Afundo (para trás)', details: '3x 5 cada perna' }, { name: 'Stiff com Halteres', details: '3x 12 reps' }], 
-                restTime: 30, specialAction: { label: 'Ver Explicação (01:02)', time: 62 } 
+                id: 'ta_b2', 
+                type: 'biset', 
+                title: 'Bloco 2 - Volume e Isolamento', 
+                summary: 'Trabalho de potência no Leg Press, permitindo empurrar mais carga com o tronco estabilizado, seguido do isolamento do glúteo médio na cadeira abdutora (essencial para proteger o joelho nos agachamentos).',
+                items: [
+                    { name: 'Leg Press', details: '3x 12 reps' }, 
+                    { name: 'Cadeira Abdutora', details: '3x 15 reps' }
+                ], 
+                restTime: 60, 
+                specialAction: { label: 'Registrar Execução', time: 0 } 
             },
             { 
-                id: 't1_b2', type: 'biset', title: 'Bloco 2 - Combinado', 
-                summary: 'Executar sem descanso entre os exercícios e máximo de 30 segundos de descanso ao final da série.',
-                items: [{ name: 'Cadeira Flexora', details: '3x Lados alternados' }, { name: 'Agachamento Halteres', details: '3x' }], 
-                restTime: 30, specialAction: { label: 'Ver Explicação (02:21)', time: 141 } 
+                id: 'ta_b3', 
+                type: 'biset', 
+                title: 'Bloco 3 - Exaustão e Contração', 
+                summary: 'A cadeira extensora leva o quadríceps à falha muscular sem carga axial na coluna. Na elevação pélvica, o foco é o pico de contração: suba o quadril com potência e aperte o glúteo por 2 segundos antes de descer.',
+                items: [
+                    { name: 'Cadeira Extensora', details: '3x 12 reps' }, 
+                    { name: 'Elevação Pélvica', details: '3x 12 reps (segura 2s)' }
+                ], 
+                restTime: 60, 
+                specialAction: { label: 'Registrar Execução', time: 0 } 
             },
             { 
-                id: 't1_b3', type: 'biset', title: 'Bloco 3 - Combinado', 
-                summary: 'Cadeira Abdutora mantendo o tronco reto. Elevação Pélvica subindo o quadril com potência e descendo devagar.',
-                items: [{ name: 'Cadeira Abdutora', details: '3x' }, { name: 'Elevação Pélvica', details: '3x' }], 
-                restTime: 30, specialAction: { label: 'Ver Explicação (03:07)', time: 187 } 
-            },
-            { 
-                id: 't1_fim', type: 'single', title: 'Bloco Final', 
-                summary: 'Treino intervalado de alta intensidade (Bicicleta ou Elíptico). 8 tiros.',
-                items: [{ name: 'Pedalada Forte/Leve', details: '8x (20s Forte + 10s Leve)' }], 
-                restTime: 0, specialAction: { label: 'Ver Explicação (03:44)', time: 224 } 
+                id: 'ta_b4', 
+                type: 'biset', 
+                title: 'Bloco 4 - Core e Panturrilha', 
+                summary: 'A panturrilha exige amplitude máxima (desça o calcanhar o máximo possível e suba na ponta dos pés). A prancha recruta o core de forma isométrica para fortalecer o cinturão abdominal.',
+                items: [
+                    { name: 'Panturrilha', details: '4x 15 a 20 reps' }, 
+                    { name: 'Prancha Abdominal', details: '4x 40 a 60 segundos' }
+                ], 
+                restTime: 45, 
+                specialAction: { label: 'Registrar Execução', time: 0 } 
             }
         ]
     },
-    2: {
-        title: "Treino 2: Superior",
-        description: "Foco: Braços, Costas e Peito",
-        videoUrl: "https://youtu.be/UpNMgqa1OQY",
-        segments: [{ time: 0, label: "Aula Completa", sub: "Reproduzir do início", icon: "play", color: "pink" }],
+    'B': {
+        title: "Treino B: Superior (Completo)",
+        description: "Foco: Peito, Costas e Braços",
+        videoUrl: "",
         exercises: [
-            { id: 't2_aq', type: 'single', title: 'Aquecimento', summary: 'Resumo pendente de análise do vídeo.', items: [{ name: 'Mobilidade Geral', details: '3x 20s' }], restTime: 0, specialAction: { label: 'Ver Explicação (00:00)', time: 0 } },
-            { id: 't2_b1', type: 'biset', title: 'Bloco 1', summary: 'Resumo pendente de análise do vídeo.', items: [{ name: 'Flexão de Braço', details: '3x 5 reps' }, { name: 'Remada Curvada', details: '3x 10 reps' }], restTime: 60, specialAction: { label: 'Ver Explicação (00:00)', time: 0 } },
-            { id: 't2_b2', type: 'biset', title: 'Bloco 2', summary: 'Resumo pendente de análise do vídeo.', items: [{ name: 'Supino Barra', details: '3x 10 reps' }, { name: 'Rosca Alternada', details: '3x 12 reps' }], restTime: 60, specialAction: { label: 'Ver Explicação (00:00)', time: 0 } },
-            { id: 't2_b3', type: 'biset', title: 'Bloco 3', summary: 'Resumo pendente de análise do vídeo.', items: [{ name: 'Puxada Aberta', details: '3x 12 reps' }, { name: 'Tríceps Francês', details: '3x 8 reps' }], restTime: 60, specialAction: { label: 'Ver Explicação (00:00)', time: 0 } },
-            { id: 't2_b4', type: 'biset', title: 'Bloco 4', summary: 'Resumo pendente de análise do vídeo.', items: [{ name: 'Crucifixo', details: '3x 10 reps' }, { name: 'Tríceps Banco', details: '3x 8 reps' }], restTime: 60, specialAction: { label: 'Ver Explicação (00:00)', time: 0 } },
-            { id: 't2_fim', type: 'single', title: 'Core', summary: 'Resumo pendente de análise do vídeo.', items: [{ name: 'Prancha Abdominal', details: '4x Falha' }], restTime: 40, specialAction: { label: 'Ver Explicação (00:00)', time: 0 } }
+            { 
+                id: 'tb_b1', 
+                type: 'biset', 
+                title: 'Bloco 1 - Antagônicos Base', 
+                summary: 'Biset de músculos opostos. A puxada aberta foca na expansão da grande dorsal (largura das costas). O supino recruta o peitoral maior em conjunto com o deltoide anterior. Essa oposição mantém alto fluxo sanguíneo superior.',
+                items: [
+                    { name: 'Puxada Aberta', details: '3x 12 reps' }, 
+                    { name: 'Supino (Barra ou Máquina)', details: '3x 10 a 12 reps' }
+                ], 
+                restTime: 60, 
+                specialAction: { label: 'Registrar Execução', time: 0 } 
+            },
+            { 
+                id: 'tb_b2', 
+                type: 'biset', 
+                title: 'Bloco 2 - Espessura e Alongamento', 
+                summary: 'A remada curvada foca na espessura (miolo) das costas, exigindo estabilização lombar. O crucifixo trabalha o alongamento transversal das fibras do peito, proporcionando um estímulo de hipertrofia diferente do supino.',
+                items: [
+                    { name: 'Remada Curvada (ou Unilateral)', details: '3x 12 reps' }, 
+                    { name: 'Crucifixo', details: '3x 12 reps' }
+                ], 
+                restTime: 60, 
+                specialAction: { label: 'Registrar Execução', time: 0 } 
+            },
+            { 
+                id: 'tb_b3', 
+                type: 'biset', 
+                title: 'Bloco 3 - Isolamento Costas e Falha', 
+                summary: 'O pull down isola a asa das costas (dorsal) sem usar o bíceps como músculo auxiliar. A flexão de braço atua como um movimento finalizador até a falha para esgotar completamente o peito e o tríceps.',
+                items: [
+                    { name: 'Pull Down', details: '3x 12 reps' }, 
+                    { name: 'Flexão de Braço', details: '3x Falha' }
+                ], 
+                restTime: 60, 
+                specialAction: { label: 'Registrar Execução', time: 0 } 
+            },
+            { 
+                id: 'tb_b4', 
+                type: 'biset', 
+                title: 'Bloco 4 - Foco em Braços', 
+                summary: 'Isolamento exclusivo de extremidades. A rosca alternada permite concentrar a força no giro de punho (supinação) ativando o bíceps. O tríceps banco atua empurrando o peso corporal, garantindo o pump final nos braços.',
+                items: [
+                    { name: 'Rosca Alternada', details: '3x 12 reps (cada braço)' }, 
+                    { name: 'Tríceps Banco (ou Francês)', details: '3x 12 reps' }
+                ], 
+                restTime: 45, 
+                specialAction: { label: 'Registrar Execução', time: 0 } 
+            }
         ]
     },
-    3: {
-        title: "Treino 3: Full Body",
-        description: "Pernas + Ombros e Costas",
-        videoUrl: "https://youtu.be/134-0UCMkMM",
+    'C': {
+        title: "Treino C: Inferior (Posterior)",
+        description: "Foco: Posteriores de Coxa e Glúteo",
+        videoUrl: "",
         exercises: [
-            { id: 't3_aq', type: 'single', title: 'Aquecimento', summary: 'Resumo pendente de análise do vídeo.', items: [{ name: 'Desenv + Agach + Chão', details: '3x (5+10+15)' }], restTime: 0, specialAction: { label: 'Ver Explicação (00:00)', time: 0 } },
-            { id: 't3_b1', type: 'biset', title: 'Bloco 1', summary: 'Resumo pendente de análise do vídeo.', items: [{ name: 'Agachamento Búlgaro', details: '3x 8/perna' }, { name: 'Supino Máquina', details: '3x 10 reps' }], restTime: 60, specialAction: { label: 'Ver Explicação (00:00)', time: 0 } },
-            { id: 't3_b2', type: 'biset', title: 'Bloco 2', summary: 'Resumo pendente de análise do vídeo.', items: [{ name: 'Remada Unilateral', details: '3x 8/braço' }, { name: 'Cadeira Extensora', details: '3x 10' }], restTime: 60, specialAction: { label: 'Ver Explicação (00:00)', time: 0 } },
-            { id: 't3_b3', type: 'biset', title: 'Bloco 3', summary: 'Resumo pendente de análise do vídeo.', items: [{ name: 'Stiff Barra', details: '3x 12 reps' }, { name: 'Pull Down', details: '3x 10 reps' }], restTime: 60, specialAction: { label: 'Ver Explicação (00:00)', time: 0 } },
-            { id: 't3_b4', type: 'biset', title: 'Bloco 4', summary: 'Resumo pendente de análise do vídeo.', items: [{ name: 'Agachamento Barra', details: '3x 12 reps' }, { name: 'Desenvolvimento', details: '3x 10 reps' }], restTime: 60, specialAction: { label: 'Ver Explicação (00:00)', time: 0 } },
-            { id: 't3_fim', type: 'single', title: 'Final', summary: 'Resumo pendente de análise do vídeo.', items: [{ name: 'Burpee + Agach Salto', details: '5 Rounds' }], restTime: 0, specialAction: { label: 'Ver Explicação (00:00)', time: 0 } }
+            { 
+                id: 'tc_b1', 
+                type: 'biset', 
+                title: 'Bloco 1 - Cadeia Posterior Pesada', 
+                summary: 'O levantamento terra (ou stiff pesado) ativa toda a cadeia posterior (isquiotibiais, glúteo e lombar). O agachamento búlgaro direciona a tensão para uma única perna, promovendo um alto nível de estresse muscular no glúteo e vasto medial.',
+                items: [
+                    { name: 'Levantamento Terra (ou Stiff Barra)', details: '3x 10 reps' }, 
+                    { name: 'Agachamento Búlgaro', details: '3x 10 reps (cada perna)' }
+                ], 
+                restTime: 60, 
+                specialAction: { label: 'Registrar Execução', time: 0 } 
+            },
+            { 
+                id: 'tc_b2', 
+                type: 'biset', 
+                title: 'Bloco 2 - Isolamento e Adutores', 
+                summary: 'A cadeira flexora gera tensão contínua e exclusividade para a musculatura posterior da coxa. O agachamento sumô entra recrutando a parte interna (adutores) e exigindo descida vertical para foco no glúteo.',
+                items: [
+                    { name: 'Cadeira Flexora', details: '3x 12 a 15 reps' }, 
+                    { name: 'Agachamento Sumô', details: '3x 12 reps' }
+                ], 
+                restTime: 60, 
+                specialAction: { label: 'Registrar Execução', time: 0 } 
+            },
+            { 
+                id: 'tc_b3', 
+                type: 'biset', 
+                title: 'Bloco 3 - Alongamento e Isometria', 
+                summary: 'O stiff com halteres promove um alongamento máximo das fibras isquiotibiais sob carga. Finalize o combo com o agachamento isométrico (sustentação na parede), impondo exaustão pela falta de oxigenação muscular temporária.',
+                items: [
+                    { name: 'Stiff Halteres', details: '3x 12 reps' }, 
+                    { name: 'Agachamento Isométrico', details: '3x Máximo tempo possível' }
+                ], 
+                restTime: 60, 
+                specialAction: { label: 'Registrar Execução', time: 0 } 
+            },
+            { 
+                id: 'tc_b4', 
+                type: 'biset', 
+                title: 'Bloco 4 - Core e Aceleração', 
+                summary: 'Transição para o sistema cardiovascular. O abdominal remador recruta o reto abdominal de ponta a ponta. Os tiros de cardio obrigam o corpo a usar o glicogênio restante e otimizam o ambiente metabólico.',
+                items: [
+                    { name: 'Abdominal Remador', details: '3x 15 a 20 reps' }, 
+                    { name: 'Tiros de Cardio (Bike/Elíptico)', details: '3 minutos (30s forte / 30s leve)' }
+                ], 
+                restTime: 45, 
+                specialAction: { label: 'Registrar Execução', time: 0 } 
+            }
         ]
     },
-    4: {
-        title: "Treino 4: Metabólico",
-        description: "Queima Calórica e Resistência",
-        videoUrl: "https://d21d.blob.core.windows.net/treinos/treino04.mp4",
-        exercises: [{ id: 't4_main', type: 'single', title: 'Circuito', summary: 'Resumo pendente de análise do vídeo.', items: [{ name: 'Cardio Moderado', details: '3 Min' }, { name: 'Agachamentos', details: '20 reps' }, { name: 'Abdominal Remador', details: '10 reps' }], restTime: 0, note: "Semana 1: 5 Rounds. Aumentar 1 round/sem.", specialAction: { label: 'Ver Explicação (00:00)', time: 0 } }]
-    },
-    5: {
-        title: "Treino 5: Pirâmide",
-        description: "Reps 20-16-12-8",
-        videoUrl: "https://d21d.blob.core.windows.net/treinos/treino05.mp4",
+    'D': {
+        title: "Treino D: Full Body Metabólico",
+        description: "Foco: Ombros, Core e Queima Calórica",
+        videoUrl: "",
         exercises: [
-            { id: 't5_main', type: 'single', title: 'Série Gigante', summary: 'Resumo pendente de análise do vídeo.', items: [{ name: 'Agachamento Sumô', details: 'Descrescente' }, { name: 'Leg Press', details: 'Descrescente' }, { name: 'Panturrilha', details: 'Descrescente' }, { name: 'Agachamento Iso', details: '20 seg fim' }], restTime: 60, specialAction: { label: 'Ver Explicação (00:00)', time: 0 } },
-            { id: 't5_fim', type: 'single', title: 'Cardio', summary: 'Resumo pendente de análise do vídeo.', items: [{ name: 'Intervalado 10min', details: '1min Forte/Leve' }], restTime: 0, specialAction: { label: 'Ver Explicação (00:00)', time: 0 } }
-        ]
-    },
-    6: {
-        title: "Treino 6: Força",
-        description: "Blocos 15-12-9 reps",
-        videoUrl: "https://d21d.blob.core.windows.net/treinos/treino06.mp4",
-        exercises: [
-            { id: 't6_b1', type: 'single', title: 'Bloco 1', summary: 'Resumo pendente de análise do vídeo.', items: [{ name: 'Supino + Martelo', details: '15-12-9 reps' }], restTime: 0, specialAction: { label: 'Ver Explicação (00:00)', time: 0 } },
-            { id: 't6_b2', type: 'single', title: 'Bloco 2', summary: 'Resumo pendente de análise do vídeo.', items: [{ name: 'Remada + Testa', details: '15-12-9 reps' }], restTime: 0, specialAction: { label: 'Ver Explicação (00:00)', time: 0 } },
-            { id: 't6_b3', type: 'single', title: 'Bloco 3', summary: 'Resumo pendente de análise do vídeo.', items: [{ name: 'Thruster + Abd', details: '15-12-9 reps' }], restTime: 0, specialAction: { label: 'Ver Explicação (00:00)', time: 0 } },
-            { id: 't6_fim', type: 'single', title: 'Desafio', summary: 'Resumo pendente de análise do vídeo.', items: [{ name: 'Snatch + Crunch', details: '10-8-6-4-2' }], restTime: 0, specialAction: { label: 'Ver Explicação (00:00)', time: 0 } }
-        ]
-    },
-    7: {
-        title: "Treino 7: Full Body",
-        description: "4 Séries de 15 Repetições",
-        videoUrl: "https://d21d.blob.core.windows.net/treinos/treino07.mp4",
-        exercises: [
-            { id: 't7_b1', type: 'biset', title: 'Bloco 1', summary: 'Resumo pendente de análise do vídeo.', items: [{ name: 'Cadeira Extensora', details: '4x 15' }, { name: 'Puxada Aberta', details: '4x 15' }], restTime: 60, specialAction: { label: 'Ver Explicação (00:00)', time: 0 } },
-            { id: 't7_b2', type: 'biset', title: 'Bloco 2', summary: 'Resumo pendente de análise do vídeo.', items: [{ name: 'Levantamento Terra', details: '4x 15' }, { name: 'Tríceps Corda', details: '4x 15' }], restTime: 60, specialAction: { label: 'Ver Explicação (00:00)', time: 0 } },
-            { id: 't7_b3', type: 'biset', title: 'Bloco 3', summary: 'Resumo pendente de análise do vídeo.', items: [{ name: 'Cadeira Flexora', details: '4x 15' }, { name: 'Remada Baixa', details: '4x 15' }], restTime: 60, specialAction: { label: 'Ver Explicação (00:00)', time: 0 } },
-            { id: 't7_fim', type: 'single', title: 'Final', summary: 'Resumo pendente de análise do vídeo.', items: [{ name: 'Agach Salto + Tap', details: '30-20-10' }], restTime: 0, specialAction: { label: 'Ver Explicação (00:00)', time: 0 } }
+            { 
+                id: 'td_b1', 
+                type: 'biset', 
+                title: 'Bloco 1 - Potência Vertical', 
+                summary: 'O desenvolvimento constrói ombros fortes e estáveis. O agachamento com salto transforma a força em potência, elevando imediatamente a frequência cardíaca e recrutando fibras de contração rápida nas pernas.',
+                items: [
+                    { name: 'Desenvolvimento', details: '3x 12 reps' }, 
+                    { name: 'Agachamento com Salto', details: '3x 15 reps' }
+                ], 
+                restTime: 60, 
+                specialAction: { label: 'Registrar Execução', time: 0 } 
+            },
+            { 
+                id: 'td_b2', 
+                type: 'biset', 
+                title: 'Bloco 2 - Tração e Corpo Inteiro', 
+                summary: 'A remada baixa exige contração do miolo das costas com ritmo controlado. O thruster (agacha e empurra) é um exercício sistêmico que consome alta energia ao transferir força da perna diretamente para os braços.',
+                items: [
+                    { name: 'Remada Baixa', details: '3x 12 reps' }, 
+                    { name: 'Thruster (Agachamento + Press)', details: '3x 12 reps' }
+                ], 
+                restTime: 60, 
+                specialAction: { label: 'Registrar Execução', time: 0 } 
+            },
+            { 
+                id: 'td_b3', 
+                type: 'biset', 
+                title: 'Bloco 3 - Braços Integrados', 
+                summary: 'A rosca martelo atinge o bíceps e o braquiorradial (antebraço), melhorando a pegada geral. O tríceps corda enfatiza a cabeça lateral do tríceps, exigindo a "abertura" da corda no fim do movimento para máxima eficácia.',
+                items: [
+                    { name: 'Rosca Martelo', details: '3x 12 reps' }, 
+                    { name: 'Tríceps Corda', details: '3x 12 reps' }
+                ], 
+                restTime: 60, 
+                specialAction: { label: 'Registrar Execução', time: 0 } 
+            },
+            { 
+                id: 'td_b4', 
+                type: 'biset', 
+                title: 'Bloco 4 - Desafio Final', 
+                summary: 'O burpee é um ativador cardíaco sistêmico que testa a resistência ao lactato. A prancha abdominal imediatamente depois ensina o core a se estabilizar e proteger a coluna mesmo sob fadiga respiratória extrema.',
+                items: [
+                    { name: 'Burpee', details: '3x 10 a 12 reps' }, 
+                    { name: 'Prancha Abdominal', details: '3x 40 a 60 segundos' }
+                ], 
+                restTime: 45, 
+                specialAction: { label: 'Registrar Execução', time: 0 } 
+            }
         ]
     }
 };
 
 let currentWorkoutKey = null;
 
+// --- GESTÃO DE ROTAÇÃO E PERSISTÊNCIA NO FIREBASE ---
+
+const ORDER = ['A', 'B', 'C', 'D'];
+
+// Descobre o próximo treino baseado no último gravado no Firebase
+async function getNextWorkoutKey() {
+    const user = auth.currentUser;
+    if (!user) return 'A'; // Padrão se não logado
+
+    const profileRef = ref(db, `users/${user.uid}/profile`);
+    try {
+        const snapshot = await get(profileRef);
+        if (snapshot.exists() && snapshot.val().lastWorkoutKey) {
+            const lastKey = snapshot.val().lastWorkoutKey;
+            const currentIndex = ORDER.indexOf(lastKey);
+            // Rotaciona: se for o último (D), volta pro 0 (A)
+            return ORDER[(currentIndex + 1) % ORDER.length];
+        }
+    } catch (error) {
+        console.error("Erro ao buscar último treino:", error);
+    }
+    return 'A'; // Se não encontrar histórico, começa do A
+}
+
+// Chame esta função QUANDO A BRUNA FINALIZAR O TREINO na tela de execução
+window.saveWorkoutCompletion = async function(completedWorkoutKey) {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const updates = {};
+    const dateStr = new Date().toISOString().split('T')[0];
+    
+    // 1. Atualiza qual foi o último treino para o ciclo rotativo
+    updates[`users/${user.uid}/profile/lastWorkoutKey`] = completedWorkoutKey;
+    
+    // 2. Salva no histórico para análise de quais treinos foram feitos (mapeamento)
+    updates[`users/${user.uid}/history/${dateStr}`] = {
+        workoutKey: completedWorkoutKey,
+        completedAt: new Date().toISOString()
+    };
+
+    try {
+        await update(ref(db), updates);
+        console.log(`Treino ${completedWorkoutKey} salvo com sucesso!`);
+        // Opcional: alert ou redirecionamento para a home aqui
+    } catch (error) {
+        console.error("Erro ao salvar conclusão do treino:", error);
+    }
+};
+
 // --- 3. GESTÃO DE INTERFACE (UI) ---
 
-// Anexar ao window para poder ser chamado pelo HTML
-window.renderHome = function() {
+window.renderHome = async function() {
     currentWorkoutKey = null;
     const appDiv = document.getElementById('app');
-    const today = new Date().getDay(); 
-    const schedule = { 1:'1', 2:'2', 3:'3', 4:'4', 5:'5', 6:'6', 0:'7' };
-    const todayKey = schedule[today];
+    
+    // Tela de loading enquanto consulta o Firebase
+    appDiv.innerHTML = `
+        <div class="h-screen w-full flex items-center justify-center bg-slate-900">
+            <p class="text-pink-500 font-bold animate-pulse">Carregando seu próximo treino...</p>
+        </div>
+    `;
+
+    // Define qual é o "Treino de Hoje" dinamicamente
+    const todayKey = await getNextWorkoutKey();
     
     let html = `
         <div class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white p-6 pb-16 rounded-b-[2.5rem] shadow-2xl relative z-10 overflow-hidden">
@@ -184,7 +353,7 @@ window.renderHome = function() {
             
             <div class="flex justify-between items-center mb-8 relative z-10">
                 <div>
-                    <p class="text-[10px] text-pink-400 font-bold uppercase tracking-widest mb-1">Desafio 30+</p>
+                    <p class="text-[10px] text-pink-400 font-bold uppercase tracking-widest mb-1">Ciclo Contínuo</p>
                     <h1 class="text-2xl font-bold tracking-tight">Olá, Bruna!</h1>
                 </div>
                 <div class="flex gap-2">
@@ -200,24 +369,22 @@ window.renderHome = function() {
                 </div>
             </div>
 
-            ${todayKey ? `
             <div onclick="renderWorkout('${todayKey}')" class="bg-white text-slate-900 p-6 rounded-2xl shadow-xl cursor-pointer active:scale-[0.98] transition-all relative z-10 group">
                 <div class="flex justify-between items-start mb-3">
-                    <span class="bg-pink-100 text-pink-700 text-[10px] px-2.5 py-1 rounded-full font-extrabold uppercase tracking-wide">Treino de Hoje</span>
+                    <span class="bg-pink-100 text-pink-700 text-[10px] px-2.5 py-1 rounded-full font-extrabold uppercase tracking-wide">Próximo da Lista</span>
                     <i data-lucide="arrow-right-circle" class="text-slate-300 group-hover:text-pink-500 transition-colors"></i>
                 </div>
                 <h2 class="text-2xl font-black mb-1">${WORKOUT_PLAN[todayKey].title}</h2>
                 <p class="text-sm text-slate-500 font-medium">${WORKOUT_PLAN[todayKey].description}</p>
             </div>
-            ` : ''}
         </div>
 
         <div class="px-5 -mt-8 pb-24 relative z-20 space-y-3 fade-in">
-            <h3 class="font-bold text-slate-400 text-xs uppercase tracking-wider mb-2 pl-2">Biblioteca de Treinos</h3>
+            <h3 class="font-bold text-slate-400 text-xs uppercase tracking-wider mb-2 pl-2">Biblioteca do Ciclo</h3>
     `;
     
     Object.keys(WORKOUT_PLAN).forEach(key => {
-        if (key === todayKey) return;
+        if (key === todayKey) return; // Não repete o treino que já está em destaque
         const plan = WORKOUT_PLAN[key];
         html += `
             <button onclick="renderWorkout('${key}')" class="w-full bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4 text-left active:bg-slate-50 hover:border-pink-200 transition-all">
@@ -235,470 +402,80 @@ window.renderHome = function() {
     if(window.lucide) lucide.createIcons();
 };
 
-window.renderProgress = function() {
+window.renderProgress = async function() {
     const appDiv = document.getElementById('app');
-    const historyData = JSON.parse(localStorage.getItem('gym_history') || '{}');
+    const user = auth.currentUser;
     
-    const dates = Object.keys(historyData).sort((a,b) => new Date(b) - new Date(a));
-    let totalWorkouts = 0;
-    let recentActivityHtml = '';
+    if (!user) {
+        appDiv.innerHTML = `<div class="p-5 text-center mt-10">Faça login para ver o progresso.</div>`;
+        return;
+    }
 
-    if(dates.length === 0) {
-        recentActivityHtml = `<p class="text-slate-500 text-sm text-center py-8">Nenhum treino concluído ainda.</p>`;
-    } else {
-        dates.forEach(date => {
-            const dayData = historyData[date];
-            const exercisesDone = Object.keys(dayData).filter(exId => dayData[exId].done);
+    appDiv.innerHTML = `<div class="h-screen w-full flex items-center justify-center bg-slate-50 text-slate-500">Buscando histórico...</div>`;
+
+    try {
+        const historyRef = ref(db, `users/${user.uid}/history`);
+        const snapshot = await get(historyRef);
+        let recentActivityHtml = '';
+        
+        if (snapshot.exists()) {
+            const historyData = snapshot.val();
+            // Ordena as datas da mais recente para a mais antiga
+            const dates = Object.keys(historyData).sort((a,b) => new Date(b) - new Date(a));
             
-            if(exercisesDone.length > 0) {
-                totalWorkouts++;
-                
-                // Formatação simples da data
+            dates.forEach(date => {
+                const session = historyData[date];
                 const dateObj = new Date(date);
                 dateObj.setMinutes(dateObj.getMinutes() + dateObj.getTimezoneOffset());
                 const formattedDate = dateObj.toLocaleDateString('pt-BR');
-
+                
+                // Mapeamento visual para saber qual letra foi executada
                 recentActivityHtml += `
-                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 mb-3">
-                        <div class="flex items-center gap-3 mb-1">
-                            <div class="bg-pink-100 text-pink-600 p-2 rounded-lg"><i data-lucide="calendar-check" width="18"></i></div>
+                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 mb-3 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="bg-pink-100 text-pink-600 w-10 h-10 flex items-center justify-center rounded-lg font-black text-lg">
+                                ${session.workoutKey}
+                            </div>
                             <div>
                                 <h4 class="font-bold text-slate-700 text-sm">${formattedDate}</h4>
-                                <p class="text-xs text-slate-500 font-medium">${exercisesDone.length} blocos registrados</p>
+                                <p class="text-xs text-slate-500 font-medium">Treino Concluído</p>
                             </div>
                         </div>
+                        <i data-lucide="check-circle" class="text-green-500" width="20"></i>
                     </div>
                 `;
-            }
-        });
-    }
-
-    let html = `
-        <div class="bg-white/90 backdrop-blur-md sticky top-0 z-30 px-4 py-4 flex items-center justify-between border-b border-slate-100 shadow-sm">
-            <button onclick="renderHome()" class="p-2 -ml-2 text-slate-600 hover:bg-slate-100 rounded-full transition-colors">
-                <i data-lucide="arrow-left" width="22"></i>
-            </button>
-            <div class="text-center">
-                <h1 class="font-bold text-base text-slate-800">Meu Progresso</h1>
-            </div>
-            <div class="w-8"></div>
-        </div>
-
-        <div class="p-5 space-y-6 fade-in pb-32 pt-6">
-            <div class="grid grid-cols-2 gap-4">
-                <div class="bg-gradient-to-br from-pink-500 to-pink-600 p-5 rounded-3xl text-white shadow-lg shadow-pink-500/30">
-                    <i data-lucide="flame" width="24" class="mb-2 opacity-80"></i>
-                    <div class="text-3xl font-black mb-1">${totalWorkouts}</div>
-                    <div class="text-xs font-bold uppercase tracking-wider opacity-90">Dias Treinados</div>
-                </div>
-                <div class="bg-white border border-slate-100 p-5 rounded-3xl text-slate-800 shadow-sm">
-                    <i data-lucide="activity" width="24" class="mb-2 text-blue-500"></i>
-                    <div class="text-3xl font-black mb-1">${dates.length > 0 ? Object.keys(historyData[dates[0]]).filter(k => historyData[dates[0]][k].done).length : 0}</div>
-                    <div class="text-xs font-bold uppercase tracking-wider text-slate-400">Último Treino</div>
-                </div>
-            </div>
-
-            <div>
-                <h3 class="font-bold text-slate-400 text-xs uppercase tracking-wider mb-3 pl-2">Histórico de Atividades</h3>
-                ${recentActivityHtml || '<p class="text-sm text-slate-500 pl-2">Complete blocos de exercícios para ver seu histórico.</p>'}
-            </div>
-        </div>
-    `;
-    appDiv.innerHTML = html;
-    if(window.lucide) lucide.createIcons();
-    window.scrollTo(0,0);
-};
-
-window.renderWorkout = function(key) {
-    currentWorkoutKey = key;
-    const plan = WORKOUT_PLAN[key];
-    const appDiv = document.getElementById('app');
-    
-    let html = `
-        <div class="bg-white/90 backdrop-blur-md sticky top-0 z-30 px-4 py-4 flex items-center justify-between border-b border-slate-100 shadow-sm">
-            <button onclick="renderHome()" class="p-2 -ml-2 text-slate-600 hover:bg-slate-100 rounded-full transition-colors">
-                <i data-lucide="arrow-left" width="22"></i>
-            </button>
-            <div class="text-center">
-                <h1 class="font-bold text-base text-slate-800">${plan.title}</h1>
-            </div>
-            <button onclick="openVideoModal(0)" class="p-2 text-pink-600 bg-pink-50 rounded-full hover:bg-pink-100 transition-colors">
-                <i data-lucide="video" width="20"></i>
-            </button>
-        </div>
-
-        <div class="p-4 space-y-6 fade-in pb-32 pt-6">
-    `;
-
-    plan.exercises.forEach((ex) => {
-        const stored = window.getExerciseData(ex.id);
-        const isDone = stored.done;
-
-        let summaryHtml = '';
-        if(ex.summary) {
-            summaryHtml = `<p class="text-sm text-slate-500 mb-4 leading-relaxed">${ex.summary}</p>`;
+            });
+        } else {
+            recentActivityHtml = `<p class="text-slate-500 text-sm text-center py-8">Nenhum treino concluído ainda no Firebase.</p>`;
         }
 
-        let itemsHtml = '';
-        ex.items.forEach((item, idx) => {
-            const savedW = stored.items?.[idx]?.w || '';
-            const savedR = stored.items?.[idx]?.r || '';
-            const tip = getTip(item.name);
-
-            itemsHtml += `
-                <div class="mb-6 last:mb-0">
-                    <div class="flex flex-col gap-1 mb-3">
-                        <h4 class="font-bold text-slate-800 text-base leading-tight">${item.name}</h4>
-                        <span class="text-xs font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md self-start">${item.details}</span>
-                    </div>
-                    <div class="tip-box"><p class="tip-text">${tip}</p></div>
-                    <div class="flex gap-3">
-                        <div class="relative w-1/2">
-                            <input type="text" value="${savedW}" onchange="saveInput('${ex.id}', ${idx}, 'w', this.value)" class="input-compact pl-8" inputmode="decimal" placeholder="-">
-                            <span class="absolute left-3 top-3.5 text-[10px] text-slate-400 font-bold">KG</span>
-                        </div>
-                        <div class="relative w-1/2">
-                            <input type="text" value="${savedR}" onchange="saveInput('${ex.id}', ${idx}, 'r', this.value)" class="input-compact" inputmode="numeric" placeholder="Reps">
-                        </div>
-                    </div>
-                </div>
-            `;
-        });
-
-        let specialActionHtml = '';
-        if(ex.specialAction) {
-            specialActionHtml = `
-                <button onclick="openVideoModal(${ex.specialAction.time})" class="w-full mt-3 py-3 bg-pink-50 text-pink-600 rounded-xl text-xs font-bold uppercase tracking-wide flex items-center justify-center gap-2 hover:bg-pink-100 transition-colors">
-                    <i data-lucide="play-circle" width="16"></i> ${ex.specialAction.label}
+        let html = `
+            <div class="bg-white/90 backdrop-blur-md sticky top-0 z-30 px-4 py-4 flex items-center justify-between border-b border-slate-100 shadow-sm">
+                <button onclick="renderHome()" class="p-2 -ml-2 text-slate-600 hover:bg-slate-100 rounded-full transition-colors">
+                    <i data-lucide="arrow-left" width="22"></i>
                 </button>
-            `;
-        }
+                <div class="text-center">
+                    <h1 class="font-bold text-base text-slate-800">Meu Progresso</h1>
+                </div>
+                <div class="w-8"></div>
+            </div>
 
-        html += `
-            <div id="card-${ex.id}" class="bg-white rounded-3xl p-5 shadow-sm card-base ${isDone ? 'card-done' : ''}">
-                <div class="flex justify-between items-center mb-5 pb-3 border-b border-slate-50">
-                    <span class="badge-bi">${ex.title}</span>
-                    ${ex.restTime > 0 ? `<span class="text-xs font-bold text-slate-400 flex items-center gap-1 bg-slate-50 px-2 py-1 rounded-lg"><i data-lucide="clock" width="12"></i> ${ex.restTime}s</span>` : ''}
-                </div>
-                ${summaryHtml}
-                ${ex.note ? `<div class="mb-4 bg-amber-50 text-amber-700 text-xs font-medium p-3 rounded-xl border border-amber-100 flex gap-2 items-start"><i data-lucide="alert-triangle" width="14" class="shrink-0 mt-0.5"></i> ${ex.note}</div>` : ''}
-                <div>${itemsHtml}</div>
-                ${specialActionHtml}
-                <div class="mt-6 pt-4 border-t border-slate-100 flex gap-3">
-                    ${ex.restTime > 0 ? `<button onclick="openTimer('rest', 'Descanso', ${ex.restTime})" class="action-btn btn-rest flex-1 shadow-sm"><i data-lucide="timer" width="18"></i> ${ex.restTime}s</button>` : ''}
-                    <button onclick="toggleDone('${ex.id}')" id="btn-check-${ex.id}" class="action-btn btn-check flex-1 ${isDone ? 'checked' : ''}">
-                        ${isDone ? `<i data-lucide="check-circle-2" width="18"></i> Feito` : `<i data-lucide="circle" width="18"></i> Concluir`}
-                    </button>
-                </div>
+            <div class="p-5 space-y-6 fade-in pb-32">
+                <h3 class="font-bold text-slate-400 text-xs uppercase tracking-wider mb-2 pl-2">Histórico de Treinos (Nuvem)</h3>
+                ${recentActivityHtml}
             </div>
         `;
-    });
-
-    html += `</div>`;
-    appDiv.innerHTML = html;
-    if(window.lucide) lucide.createIcons();
-    window.scrollTo(0,0);
-};
-
-// --- 4. VIDEO E MODAIS ---
-window.openVideoModal = function(startTime = 0) {
-    const modal = document.getElementById('video-modal');
-    const iframe = document.getElementById('video-iframe');
-    const link = document.getElementById('video-external-link');
-    const subtitle = document.getElementById('video-subtitle');
-    const segmentsContainer = document.getElementById('video-segments-container');
-    
-    const currentPlan = WORKOUT_PLAN[currentWorkoutKey];
-    const rawUrl = currentPlan?.videoUrl || '';
-    
-    let finalUrl = rawUrl;
-    
-    if (rawUrl.includes('youtu.be') || rawUrl.includes('youtube.com')) {
-        let videoId = '';
-        if (rawUrl.includes('youtu.be/')) {
-            videoId = rawUrl.split('youtu.be/')[1].split('?')[0];
-        } else if (rawUrl.includes('youtube.com/watch?v=')) {
-            videoId = rawUrl.split('v=')[1].split('&')[0];
-        }
         
-        finalUrl = `https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1`;
-        if (startTime > 0) {
-            finalUrl += `&start=${startTime}`;
-        }
-        finalUrl += `&autoplay=1`;
-    } else {
-        if (startTime > 0) {
-            finalUrl += `#t=${startTime}`;
-        }
-    }
-    
-    iframe.src = finalUrl;
-    link.href = rawUrl;
-    
-    if (startTime > 0) {
-        subtitle.innerText = `Iniciando em ${formatTime(startTime)}`;
-    } else {
-        subtitle.innerText = "Aula Completa";
-    }
+        appDiv.innerHTML = html;
+        if(window.lucide) lucide.createIcons();
 
-    let segmentsHtml = '';
-    const segments = currentPlan?.segments || [];
-    
-    if(segments.length > 0) {
-        segments.forEach(seg => {
-            segmentsHtml += `
-                <button onclick="seekVideo(${seg.time}, '${seg.label}')" class="w-full text-left bg-slate-800 hover:bg-slate-700 p-3 rounded-xl flex items-center justify-between group transition-all border border-slate-700 hover:border-${seg.color || 'pink'}-500">
-                    <div class="flex items-center gap-3">
-                        <div class="bg-${seg.color || 'pink'}-600/20 text-${seg.color || 'pink'}-500 p-2 rounded-lg">
-                            <i data-lucide="${seg.icon || 'play'}" width="16"></i>
-                        </div>
-                        <div>
-                            <span class="text-white font-bold text-sm block">${seg.label}</span>
-                            <span class="text-slate-500 text-xs">${seg.sub || ''}</span>
-                        </div>
-                    </div>
-                    <i data-lucide="play" width="14" class="text-slate-500 group-hover:text-${seg.color || 'pink'}-500"></i>
-                </button>
-            `;
-        });
-    } else {
-        segmentsHtml = `<p class="text-slate-600 text-xs italic text-center py-2">Nenhum capítulo disponível para este vídeo.</p>`;
-    }
-    
-    segmentsContainer.innerHTML = segmentsHtml;
-    if(window.lucide) lucide.createIcons();
-    modal.classList.remove('hidden');
-};
-
-function formatTime(seconds) {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins < 10 ? '0'+mins : mins}:${secs < 10 ? '0'+secs : secs}`;
-}
-
-window.seekVideo = function(time, label) {
-    window.openVideoModal(time);
-};
-
-window.closeVideoModal = function() {
-    const modal = document.getElementById('video-modal');
-    const iframe = document.getElementById('video-iframe');
-    iframe.src = ""; 
-    modal.classList.add('hidden');
-};
-
-// --- 5. TIMER ---
-let timerInt = null;
-let timerTime = 0;
-let timerTotal = 0;
-
-window.openTimer = function(mode, title, seconds) {
-    const modal = document.getElementById('timer-modal');
-    timerTime = seconds;
-    timerTotal = seconds;
-    updateTimerDisplay();
-    
-    document.getElementById('modal-title').innerText = title;
-    document.getElementById('btn-toggle-timer').onclick = startTimer;
-    document.getElementById('lbl-toggle').innerText = "INICIAR";
-    
-    modal.classList.remove('hidden');
-};
-
-window.closeTimerModal = function() {
-    clearInterval(timerInt);
-    document.getElementById('timer-modal').classList.add('hidden');
-};
-
-function updateTimerDisplay() {
-    const m = Math.floor(timerTime / 60);
-    const s = timerTime % 60;
-    document.getElementById('timer-display').innerText = `${m}:${s<10?'0':''}${s}`;
-}
-
-function startTimer() {
-    clearInterval(timerInt);
-    document.getElementById('lbl-toggle').innerText = "PAUSAR";
-    document.getElementById('btn-toggle-timer').onclick = pauseTimer;
-    const btn = document.getElementById('btn-toggle-timer');
-    btn.classList.remove('bg-pink-600');
-    btn.classList.add('bg-slate-700');
-    
-    timerInt = setInterval(() => {
-        timerTime--;
-        updateTimerDisplay();
-        if(timerTime <= 0) {
-            clearInterval(timerInt);
-            if(navigator.vibrate) navigator.vibrate([200, 100, 200]);
-            window.closeTimerModal();
-        }
-    }, 1000);
-}
-
-function pauseTimer() {
-    clearInterval(timerInt);
-    document.getElementById('lbl-toggle').innerText = "CONTINUAR";
-    document.getElementById('btn-toggle-timer').onclick = startTimer;
-    const btn = document.getElementById('btn-toggle-timer');
-    btn.classList.add('bg-pink-600');
-    btn.classList.remove('bg-slate-700');
-}
-
-const btnReset = document.getElementById('btn-reset-timer');
-if(btnReset) {
-    btnReset.onclick = () => {
-        clearInterval(timerInt);
-        timerTime = timerTotal;
-        updateTimerDisplay();
-        pauseTimer();
-        document.getElementById('lbl-toggle').innerText = "INICIAR";
-    };
-}
-
-// --- 6. AUTH & LOGIN ---
-
-function renderLoginScreen() {
-    const appDiv = document.getElementById('app');
-    if (!appDiv) return;
-
-    appDiv.innerHTML = `
-        <div class="min-h-screen flex flex-col items-center justify-center bg-slate-900 p-6 text-center">
-            <div class="w-20 h-20 bg-pink-600 rounded-3xl flex items-center justify-center mb-6 shadow-lg shadow-pink-500/20">
-                <i data-lucide="lock" class="text-white" width="32"></i>
+    } catch (error) {
+        console.error("Erro ao carregar progresso:", error);
+        appDiv.innerHTML = `
+            <div class="p-5">
+                <button onclick="renderHome()" class="mb-5 text-pink-500">Voltar</button>
+                <p>Erro ao carregar os dados. Tente novamente.</p>
             </div>
-            <h1 class="text-2xl font-bold text-white mb-2">Acesso Restrito</h1>
-            <p class="text-slate-400 mb-8 text-sm">Faça login com a sua conta autorizada para gerir os seus treinos.</p>
-            <button onclick="loginPeloGoogle()" class="w-full max-w-xs bg-white text-slate-900 font-bold py-4 rounded-2xl flex items-center justify-center gap-3 active:scale-95 transition-transform">
-                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18">
-                Entrar com Google
-            </button>
-        </div>
-    `;
-    if (window.lucide) lucide.createIcons();
-}
-
-window.loginPeloGoogle = async () => {
-    try {
-        const result = await signInWithPopup(auth, provider);
-        if (result.user.email !== EMAIL_AUTORIZADO) {
-            alert("Acesso negado: Este e-mail não tem permissão.");
-            await signOut(auth);
-            location.reload();
-        }
-    } catch (error) {
-        console.error("Erro no login:", error);
+        `;
     }
 };
-
-onAuthStateChanged(auth, (user) => {
-    if (user && user.email === EMAIL_AUTORIZADO) {
-        console.log("Acesso concedido para:", user.email);
-        syncDataFromFirebase().then(() => {
-            if (window.renderHome) window.renderHome();
-        });
-    } else {
-        renderLoginScreen();
-    }
-});
-
-// --- 7. PERSISTÊNCIA DE DADOS ---
-
-window.saveExerciseData = async (exId, data) => {
-    const user = auth.currentUser;
-    if (!user) return;
-
-    const dateObj = new Date();
-    const todayBR = dateObj.toLocaleDateString('pt-BR');
-    const dateKey = dateObj.toISOString().split('T')[0];
-    
-    const localKey = `gym_data_${exId}`;
-    const currentLocal = JSON.parse(localStorage.getItem(localKey) || '{}');
-    const updated = { ...currentLocal, ...data, lastUpdate: todayBR };
-    localStorage.setItem(localKey, JSON.stringify(updated));
-
-    try {
-        await set(ref(db, `users/${user.uid}/exercises/${exId}`), updated);
-        await set(ref(db, `users/${user.uid}/history/${dateKey}/${exId}`), updated);
-        
-        // Atualiza o histórico em memória local para visualização imediata no painel
-        const historyData = JSON.parse(localStorage.getItem('gym_history') || '{}');
-        if(!historyData[dateKey]) historyData[dateKey] = {};
-        historyData[dateKey][exId] = updated;
-        localStorage.setItem('gym_history', JSON.stringify(historyData));
-
-        console.log(`Dados salvos: ${exId}`);
-    } catch (error) {
-        console.error("Erro ao salvar no Firebase:", error);
-    }
-};
-
-window.getExerciseData = (exId) => {
-    const data = JSON.parse(localStorage.getItem(`gym_data_${exId}`) || '{}');
-    const todayBR = new Date().toLocaleDateString('pt-BR');
-    
-    if (data.lastUpdate && data.lastUpdate !== todayBR) {
-        data.done = false;
-    }
-    
-    return data;
-};
-
-async function syncDataFromFirebase() {
-    const user = auth.currentUser;
-    if (!user) return;
-
-    try {
-        const snapshot = await get(ref(db, `users/${user.uid}/exercises`));
-        if (snapshot.exists()) {
-            const allData = snapshot.val();
-            Object.keys(allData).forEach(exId => {
-                localStorage.setItem(`gym_data_${exId}`, JSON.stringify(allData[exId]));
-            });
-        }
-        
-        const histSnapshot = await get(ref(db, `users/${user.uid}/history`));
-        if (histSnapshot.exists()) {
-            localStorage.setItem('gym_history', JSON.stringify(histSnapshot.val()));
-        }
-        
-        console.log("Sincronização completa.");
-    } catch (error) {
-        console.error("Erro na sincronização:", error);
-    }
-}
-
-// Funções chamadas pelo HTML
-window.saveInput = (exId, itemIdx, field, val) => {
-    const curr = window.getExerciseData(exId);
-    const items = curr.items || {};
-    if (!items[itemIdx]) items[itemIdx] = {};
-    items[itemIdx][field] = val;
-    window.saveExerciseData(exId, { items });
-};
-
-window.toggleDone = (exId) => {
-    const curr = window.getExerciseData(exId);
-    const newState = !curr.done;
-    window.saveExerciseData(exId, { done: newState });
-    
-    const card = document.getElementById(`card-${exId}`);
-    const btn = document.getElementById(`btn-check-${exId}`);
-
-    if (newState) {
-        if (card) card.classList.add('card-done');
-        if (btn) {
-            btn.classList.add('checked');
-            btn.innerHTML = `<i data-lucide="check-circle-2" width="18"></i> Feito`;
-        }
-        if (window.confetti) window.confetti({ particleCount: 60, spread: 80, origin: { y: 0.7 } });
-    } else {
-        if (card) card.classList.remove('card-done');
-        if (btn) {
-            btn.classList.remove('checked');
-            btn.innerHTML = `<i data-lucide="circle" width="18"></i> Concluir`;
-        }
-    }
-    if (window.lucide) lucide.createIcons();
-};
-
-window.logout = () => signOut(auth).then(() => location.reload());
