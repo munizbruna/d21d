@@ -302,7 +302,7 @@ async function getNextWorkoutKey() {
     return 'A'; 
 }
 
-window.saveWorkoutCompletion = async function(completedWorkoutKey) {
+window.saveWorkoutCompletion = async function(completedWorkoutKey, performanceData = {}) {
     const user = auth.currentUser;
     if (!user) return;
 
@@ -313,12 +313,13 @@ window.saveWorkoutCompletion = async function(completedWorkoutKey) {
     
     updates[`users/${user.uid}/history/${dateStr}`] = {
         workoutKey: completedWorkoutKey,
-        completedAt: new Date().toISOString()
+        completedAt: new Date().toISOString(),
+        performance: performanceData
     };
 
     try {
         await update(ref(db), updates);
-        console.log(`Treino ${completedWorkoutKey} salvo com sucesso!`);
+        console.log(`Treino ${completedWorkoutKey} e métricas salvos com sucesso!`);
     } catch (error) {
         console.error("Erro ao salvar conclusão do treino:", error);
     }
@@ -332,7 +333,26 @@ window.finalizarTreino = async function(workoutKey) {
         btn.classList.add('opacity-70');
     }
 
-    await window.saveWorkoutCompletion(workoutKey);
+    // Coleta as métricas inseridas nos inputs
+    const performanceData = {};
+    const plan = WORKOUT_PLAN[workoutKey];
+    
+    plan.exercises.forEach(ex => {
+        ex.items.forEach((item, index) => {
+            const cargaInput = document.getElementById(`carga_${ex.id}_${index}`);
+            const repsInput = document.getElementById(`reps_${ex.id}_${index}`);
+            
+            if (cargaInput && repsInput) {
+                performanceData[`${ex.id}_${index}`] = {
+                    name: item.name,
+                    carga: cargaInput.value || '',
+                    reps: repsInput.value || ''
+                };
+            }
+        });
+    });
+
+    await window.saveWorkoutCompletion(workoutKey, performanceData);
     
     if (window.confetti) {
         window.confetti({
@@ -416,11 +436,39 @@ window.renderHome = async function() {
     if(window.lucide) lucide.createIcons();
 };
 
-window.renderWorkout = function(key) {
+window.renderWorkout = async function(key) {
     currentWorkoutKey = key;
     const plan = WORKOUT_PLAN[key];
     const appDiv = document.getElementById('app');
     
+    // Mostra tela de carregamento enquanto busca o histórico de evolução
+    appDiv.innerHTML = `
+        <div class="h-screen w-full flex items-center justify-center bg-slate-50">
+            <p class="text-pink-500 font-bold animate-pulse">Resgatando suas métricas anteriores...</p>
+        </div>
+    `;
+
+    // Busca as cargas do treino anterior
+    let lastPerformance = {};
+    const user = auth.currentUser;
+    if (user) {
+        try {
+            const historyRef = ref(db, `users/${user.uid}/history`);
+            const snapshot = await get(historyRef);
+            if (snapshot.exists()) {
+                const history = snapshot.val();
+                const sortedDates = Object.keys(history).sort((a,b) => new Date(b) - new Date(a));
+                // Procura a última vez que este treino (A, B, C ou D) foi feito e pega os dados
+                const lastSessionDate = sortedDates.find(d => history[d].workoutKey === key && history[d].performance);
+                if (lastSessionDate) {
+                    lastPerformance = history[lastSessionDate].performance;
+                }
+            }
+        } catch (e) {
+            console.error("Erro ao buscar histórico:", e);
+        }
+    }
+
     let html = `
         <div class="bg-white/90 backdrop-blur-md sticky top-0 z-30 px-4 py-4 flex items-center justify-between border-b border-slate-100 shadow-sm">
             <button onclick="window.renderHome()" class="p-2 -ml-2 text-slate-600 hover:bg-slate-100 rounded-full transition-colors">
@@ -442,17 +490,35 @@ window.renderWorkout = function(key) {
                 <h3 class="font-black text-slate-800 mb-2">${ex.title}</h3>
                 <p class="text-xs text-slate-500 mb-4 leading-relaxed">${ex.summary}</p>
                 
-                <div class="space-y-3 mb-4">
+                <div class="space-y-4 mb-4">
         `;
         
         ex.items.forEach((item, index) => {
+            const inputId = `${ex.id}_${index}`;
+            const lastData = lastPerformance[inputId] || {};
+            const lastCarga = lastData.carga ? lastData.carga : '';
+            const lastReps = lastData.reps ? lastData.reps : '';
+
             html += `
-                <div class="flex justify-between items-center bg-slate-50 p-3 rounded-lg border border-slate-100">
-                    <span class="font-bold text-slate-700 text-sm flex items-center gap-2">
-                        <span class="bg-slate-200 text-slate-500 rounded-full w-5 h-5 flex items-center justify-center text-[10px]">${index + 1}</span>
-                        ${item.name}
-                    </span>
-                    <span class="text-xs font-bold text-pink-600 bg-pink-50 px-2 py-1 rounded-md">${item.details}</span>
+                <div class="bg-slate-50 p-3 rounded-lg border border-slate-100 flex flex-col gap-3">
+                    <div class="flex justify-between items-center">
+                        <span class="font-bold text-slate-700 text-sm flex items-center gap-2">
+                            <span class="bg-slate-200 text-slate-500 rounded-full min-w-[20px] h-5 flex items-center justify-center text-[10px]">${index + 1}</span>
+                            ${item.name}
+                        </span>
+                        <span class="text-xs font-bold text-pink-600 bg-pink-50 px-2 py-1 rounded-md text-right">${item.details}</span>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-3 mt-1">
+                        <div class="relative">
+                            <span class="absolute -top-2 left-2 bg-slate-50 text-[10px] font-bold text-slate-400 px-1">Carga (kg)</span>
+                            <input type="number" id="carga_${inputId}" value="${lastCarga}" class="input-compact !text-sm !p-2 border-slate-200 shadow-inner" placeholder="Ex: 20">
+                        </div>
+                        <div class="relative">
+                            <span class="absolute -top-2 left-2 bg-slate-50 text-[10px] font-bold text-slate-400 px-1">Repetições</span>
+                            <input type="number" id="reps_${inputId}" value="${lastReps}" class="input-compact !text-sm !p-2 border-slate-200 shadow-inner" placeholder="Ex: 12">
+                        </div>
+                    </div>
                 </div>
             `;
         });
@@ -489,60 +555,186 @@ window.renderProgress = async function() {
     const user = auth.currentUser;
     
     if (!user) {
-        appDiv.innerHTML = `<div class="p-5 text-center mt-10">Faça login para ver o progresso.</div>`;
+        appDiv.innerHTML = `<div class="p-5 text-center mt-10">Faça login para ver o dashboard.</div>`;
         return;
     }
 
-    appDiv.innerHTML = `<div class="h-screen w-full flex items-center justify-center bg-slate-50 text-slate-500">Buscando histórico...</div>`;
+    appDiv.innerHTML = `
+        <div class="h-screen w-full flex items-center justify-center bg-slate-50">
+            <div class="w-10 h-10 border-4 border-pink-200 border-t-pink-600 rounded-full animate-spin"></div>
+        </div>
+    `;
 
     try {
         const historyRef = ref(db, `users/${user.uid}/history`);
         const snapshot = await get(historyRef);
-        let recentActivityHtml = '';
         
-        if (snapshot.exists()) {
-            const historyData = snapshot.val();
-            const dates = Object.keys(historyData).sort((a,b) => new Date(b) - new Date(a));
-            
-            dates.forEach(date => {
-                const session = historyData[date];
-                const dateObj = new Date(date);
-                dateObj.setMinutes(dateObj.getMinutes() + dateObj.getTimezoneOffset());
-                const formattedDate = dateObj.toLocaleDateString('pt-BR');
-                
-                recentActivityHtml += `
-                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 mb-3 flex items-center justify-between">
-                        <div class="flex items-center gap-3">
-                            <div class="bg-pink-100 text-pink-600 w-10 h-10 flex items-center justify-center rounded-lg font-black text-lg shadow-sm">
-                                ${session.workoutKey}
-                            </div>
-                            <div>
-                                <h4 class="font-bold text-slate-700 text-sm">${formattedDate}</h4>
-                                <p class="text-xs text-slate-500 font-medium">Treino Concluído</p>
-                            </div>
-                        </div>
-                        <i data-lucide="check-circle" class="text-green-500" width="20"></i>
-                    </div>
-                `;
-            });
-        } else {
-            recentActivityHtml = `<p class="text-slate-500 text-sm text-center py-8">Nenhum treino concluído ainda no Firebase.</p>`;
+        if (!snapshot.exists()) {
+            appDiv.innerHTML = `
+                <div class="p-5 text-center mt-10">
+                    <h3 class="font-bold text-slate-700 mb-2">Nenhum dado encontrado</h3>
+                    <p class="text-sm text-slate-500 mb-5">Conclua seu primeiro treino para gerar o dashboard.</p>
+                    <button onclick="window.renderHome()" class="bg-pink-600 text-white px-6 py-2 rounded-xl font-bold">Voltar</button>
+                </div>`;
+            return;
         }
 
+        const historyData = snapshot.val();
+        // Ordenação cronológica (antigo para novo) para calcular evolução
+        const datesAsc = Object.keys(historyData).sort((a,b) => new Date(a) - new Date(b));
+        
+        let totalWorkouts = datesAsc.length;
+        let counts = { A: 0, B: 0, C: 0, D: 0 };
+        let exerciseHistory = {};
+
+        // Processamento dos dados brutos
+        datesAsc.forEach(date => {
+            const session = historyData[date];
+            if(counts[session.workoutKey] !== undefined) {
+                counts[session.workoutKey]++;
+            }
+
+            if(session.performance) {
+                Object.keys(session.performance).forEach(exId => {
+                    const ex = session.performance[exId];
+                    if(ex.carga || ex.reps) {
+                        if(!exerciseHistory[ex.name]) exerciseHistory[ex.name] = [];
+                        exerciseHistory[ex.name].push({ 
+                            date, 
+                            carga: parseFloat(ex.carga) || 0, 
+                            reps: parseInt(ex.reps) || 0 
+                        });
+                    }
+                });
+            }
+        });
+
+        // Lógica de Evolução (Compara último com penúltimo)
+        let progressionScore = 0;
+        let htmlProgressionList = '';
+
+        Object.keys(exerciseHistory).forEach(name => {
+            const history = exerciseHistory[name];
+            if(history.length >= 2) {
+                const last = history[history.length - 1];
+                const prev = history[history.length - 2];
+                
+                // Critério: Carga maior, OU (Carga igual e repetições maiores) = Progressão
+                let isProgression = (last.carga > prev.carga) || (last.carga === prev.carga && last.reps > prev.reps);
+                let isRegression = (last.carga < prev.carga) || (last.carga === prev.carga && last.reps < prev.reps);
+                
+                let diffLabel = "";
+                let icon = 'minus';
+                let color = 'text-slate-400';
+
+                if (isProgression) {
+                    progressionScore++;
+                    icon = 'trending-up';
+                    color = 'text-green-500';
+                    diffLabel = last.carga > prev.carga ? `+${last.carga - prev.carga}kg` : `+reps`;
+                } else if (isRegression) {
+                    progressionScore--;
+                    icon = 'trending-down';
+                    color = 'text-red-500';
+                    diffLabel = last.carga < prev.carga ? `${last.carga - prev.carga}kg` : `-reps`;
+                }
+
+                htmlProgressionList += `
+                    <div class="flex justify-between items-center bg-slate-50 p-3 rounded-xl border border-slate-100 mb-2">
+                        <span class="text-xs font-bold text-slate-700 truncate w-[45%]">${name}</span>
+                        <div class="flex items-center justify-end gap-2 w-[55%]">
+                            <span class="text-xs font-bold text-slate-400">${prev.carga}kg</span>
+                            <i data-lucide="arrow-right" width="12" class="text-slate-300"></i>
+                            <span class="text-xs font-black ${color}">${last.carga}kg</span>
+                            <div class="flex items-center bg-white px-1.5 py-0.5 rounded border border-slate-100 min-w-[40px] justify-center">
+                                <i data-lucide="${icon}" width="12" class="${color} mr-1"></i>
+                                <span class="text-[10px] font-bold ${color}">${diffLabel}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+        });
+
+        if (htmlProgressionList === '') {
+            htmlProgressionList = `<p class="text-xs text-slate-400 text-center py-4">Faça o mesmo exercício pelo menos duas vezes preenchendo as cargas para ver sua evolução.</p>`;
+        }
+
+        // Definição do Status Global
+        let statusTitle = "Estagnada ⚖️";
+        let statusDesc = "Suas cargas e repetições se mantiveram nos últimos treinos.";
+        let statusColorBg = "bg-yellow-100";
+        let statusColorText = "text-yellow-700";
+
+        if (progressionScore > 0) {
+            statusTitle = "Progredindo 🚀";
+            statusDesc = "Você aumentou cargas ou repetições na maioria dos exercícios recentes!";
+            statusColorBg = "bg-green-100";
+            statusColorText = "text-green-700";
+        } else if (progressionScore < 0) {
+            statusTitle = "Regredindo 📉";
+            statusDesc = "Suas cargas caíram recentemente. Atenção à alimentação pré-treino e descanso.";
+            statusColorBg = "bg-red-100";
+            statusColorText = "text-red-700";
+        }
+
+        // Renderização do HTML Final
         let html = `
             <div class="bg-white/90 backdrop-blur-md sticky top-0 z-30 px-4 py-4 flex items-center justify-between border-b border-slate-100 shadow-sm">
                 <button onclick="window.renderHome()" class="p-2 -ml-2 text-slate-600 hover:bg-slate-100 rounded-full transition-colors">
                     <i data-lucide="arrow-left" width="22"></i>
                 </button>
                 <div class="text-center">
-                    <h1 class="font-bold text-base text-slate-800">Meu Progresso</h1>
+                    <h1 class="font-bold text-base text-slate-800">Dashboard</h1>
                 </div>
                 <div class="w-8"></div>
             </div>
 
             <div class="p-5 space-y-6 fade-in pb-32">
-                <h3 class="font-bold text-slate-400 text-xs uppercase tracking-wider mb-2 pl-2">Histórico de Treinos (Nuvem)</h3>
-                ${recentActivityHtml}
+                
+                <!-- KPI Card -->
+                <div class="flex gap-4">
+                    <div class="flex-1 bg-slate-900 rounded-2xl p-4 text-white relative overflow-hidden shadow-lg shadow-slate-900/20">
+                        <div class="absolute -right-4 -top-4 w-16 h-16 bg-pink-500/20 rounded-full blur-xl"></div>
+                        <p class="text-[10px] uppercase font-bold text-pink-400 tracking-wider mb-1">Total Concluído</p>
+                        <h2 class="text-4xl font-black">${totalWorkouts}<span class="text-sm font-medium text-slate-400 ml-1">treinos</span></h2>
+                    </div>
+                </div>
+
+                <!-- Status de Evolução -->
+                <div class="${statusColorBg} rounded-2xl p-5 border border-white shadow-sm">
+                    <h3 class="font-black text-lg ${statusColorText} mb-1">${statusTitle}</h3>
+                    <p class="text-xs ${statusColorText} opacity-80 leading-relaxed font-medium">${statusDesc}</p>
+                </div>
+
+                <!-- Distribuição dos Treinos -->
+                <div class="bg-white border border-slate-100 rounded-2xl p-5 shadow-sm">
+                    <h3 class="font-black text-slate-800 text-sm mb-4">Distribuição do Ciclo</h3>
+                    <div class="space-y-3">
+                        ${['A', 'B', 'C', 'D'].map(key => {
+                            const pct = totalWorkouts > 0 ? Math.round((counts[key] / totalWorkouts) * 100) : 0;
+                            return `
+                                <div>
+                                    <div class="flex justify-between text-xs font-bold text-slate-600 mb-1">
+                                        <span>Treino ${key}</span>
+                                        <span>${counts[key]}x (${pct}%)</span>
+                                    </div>
+                                    <div class="w-full bg-slate-100 rounded-full h-2.5">
+                                        <div class="bg-pink-500 h-2.5 rounded-full" style="width: ${pct}%"></div>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+
+                <!-- Lista de Evolução por Exercício -->
+                <div class="bg-white border border-slate-100 rounded-2xl p-5 shadow-sm">
+                    <h3 class="font-black text-slate-800 text-sm mb-1">Evolução por Exercício</h3>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-4">Última vs Penúltima Execução</p>
+                    ${htmlProgressionList}
+                </div>
+
             </div>
         `;
         
@@ -550,11 +742,11 @@ window.renderProgress = async function() {
         if(window.lucide) lucide.createIcons();
 
     } catch (error) {
-        console.error("Erro ao carregar progresso:", error);
+        console.error("Erro ao carregar dashboard:", error);
         appDiv.innerHTML = `
-            <div class="p-5">
-                <button onclick="window.renderHome()" class="mb-5 text-pink-500 font-bold">Voltar</button>
-                <p>Erro ao carregar os dados. Tente novamente.</p>
+            <div class="p-5 text-center mt-10">
+                <button onclick="window.renderHome()" class="mb-5 text-pink-500 font-bold bg-pink-50 px-4 py-2 rounded-lg">Voltar</button>
+                <p class="text-slate-500">Erro ao carregar os dados analíticos.</p>
             </div>
         `;
     }
@@ -580,37 +772,8 @@ window.closeTimerModal = function() {
     if(modal) modal.classList.add('hidden');
 };
 
-// Monitoramento de Autenticação e Inicialização
-onAuthStateChanged(auth, (user) => {
-    const statusDiv = document.getElementById('connection-status');
-    if (user) {
-        if(statusDiv) {
-            statusDiv.textContent = "Conectado";
-            statusDiv.classList.add('show');
-            setTimeout(() => statusDiv.classList.remove('show'), 2000);
-        }
-        window.renderHome();
-    } else {
-        // Fluxo de login provisório se não houver usuário autenticado
-        // Descomente a linha abaixo para forçar o login automático via Google para testes
-        // signInWithPopup(auth, provider); 
-        
-        const appDiv = document.getElementById('app');
-        if(appDiv) {
-            appDiv.innerHTML = `
-                <div class="h-screen w-full flex flex-col items-center justify-center bg-slate-900 p-8 text-center">
-                    <h1 class="text-white text-2xl font-bold mb-4">Desafio D21D</h1>
-                    <p class="text-slate-400 mb-8">Faça login para acessar seus treinos e salvar seu progresso.</p>
-                    <button onclick="signInWithPopup(auth, provider)" class="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-4 rounded-xl shadow-lg">
-                        Entrar com Google
-                    </button>
-                </div>
-            `;
-        }
-    }
-});
 
-// Força a renderização inicial caso o onAuthStateChanged demore
+
 if(!auth.currentUser) {
     window.renderHome();
 }
