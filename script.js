@@ -772,6 +772,8 @@ window.closeTimerModal = function() {
     if(modal) modal.classList.add('hidden');
 };
 
+
+// Monitoramento de Autenticação e Inicialização
 onAuthStateChanged(auth, (user) => {
     const statusDiv = document.getElementById('connection-status');
     if (user) {
@@ -782,6 +784,10 @@ onAuthStateChanged(auth, (user) => {
         }
         window.renderHome();
     } else {
+        // Fluxo de login provisório se não houver usuário autenticado
+        // Descomente a linha abaixo para forçar o login automático via Google para testes
+        // signInWithPopup(auth, provider); 
+        
         const appDiv = document.getElementById('app');
         if(appDiv) {
             appDiv.innerHTML = `
